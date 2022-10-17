@@ -54,7 +54,7 @@ Protected routes:
 
 ### Registration
 
-You can register to a mongodb store with a POST request to /register with a body such as:
+You can register to a mongodb store with a POST request to `/register` with a body such as:
 
 ```
 {
@@ -111,10 +111,10 @@ I have yet to add a data model for Nations.
 
 ## TODO
 
-Add Nations data model
-Add logic for allocating nations
-Start building out required features
-Consider local copy of World Cup 2022 API, + cronjob to populate the database within rate limits
-Consider rate limiting / throttling:
-- registration attempts
-- login attempts
+- Add Nations data model
+- Add logic for allocating nations
+- Start building out required features
+- Consider local copy of World Cup 2022 API, + cronjob to populate the database within rate limits
+- Consider rate limiting / throttling:
+	- registration attempts
+	- login attempts
