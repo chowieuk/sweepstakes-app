@@ -31,7 +31,7 @@ func InitializeAuth(collection *mongo.Collection) *auth.Service {
 		TokenDuration:     time.Minute,                                 // short token, refreshed automatically
 		CookieDuration:    time.Hour * 24,                              // cookie fine to keep for long time
 		DisableXSRF:       true,                                        // don't disable XSRF in real-life applications!
-		Issuer:            "my-demo-service",                           // part of token, just informational
+		Issuer:            "PaChowie Sweepstakes",                      // part of token, just informational
 		URL:               "http://localhost:8080",                     // base url of the protected service
 		AvatarStore:       avatar.NewLocalFS("/tmp/demo-auth-service"), // stores avatars locally
 		AvatarResizeLimit: 200,                                         // resizes avatars to 200x200
@@ -51,12 +51,15 @@ func InitializeAuth(collection *mongo.Collection) *auth.Service {
 				if strings.HasPrefix(claims.User.ID, "facebook_") { // allow all users with facebook auth
 					return true
 				}
-				if strings.HasPrefix(claims.User.ID, "mongo_") { // allow all users with facebook auth
+				if strings.HasPrefix(claims.User.ID, "mongo_") { // allow all users with mongo auth
 					return true
 				}
-				if strings.HasPrefix(claims.User.Name, "dev_") { // non-guthub allow only dev_* names
+				if strings.HasPrefix(claims.User.ID, "dev_") { // allow all users with dev auth
 					return true
 				}
+				// if strings.HasPrefix(claims.User.Name, "dev_") { // only dev_* names are permitted
+				// 	return true
+				// }
 			}
 			return false
 		}),
@@ -66,6 +69,7 @@ func InitializeAuth(collection *mongo.Collection) *auth.Service {
 
 	// create auth service
 	service := auth.NewService(options)
+	service.AddProvider("dev", "", "")                                                              // add dev provider
 	service.AddProvider("google", os.Getenv("GOOGLE_CLIENT_ID"), os.Getenv("GOOGLE_CLIENT_SECRET")) // add google provider
 	service.AddProvider("facebook", os.Getenv("FACEBOOK_APP_ID"), os.Getenv("FACEBOOK_APP_SECRET")) // add facebook provider
 
@@ -92,6 +96,16 @@ func InitializeAuth(collection *mongo.Collection) *auth.Service {
 	// // TODO: Build some email templates
 	// msgTemplate := "Hi {{.User}}, here's your confirmation email!\n To confirm please follow http://chowie.uk/auth/email/login?token={{.Token}}\n{{.Address}}\n{{.Site}}"
 	// service.AddVerifProvider("email", msgTemplate, namecheapSender)
+
+	// run dev/test oauth2 server on :8084
+	go func() {
+		devAuthServer, err := service.DevAuth() // peak dev oauth2 server
+		if err != nil {
+			log.Printf("[PANIC] failed to start dev oauth2 server, %v", err)
+		}
+		devAuthServer.Run(context.Background())
+	}()
+
 	return service
 }
 
