@@ -5,6 +5,7 @@
 ### Frontend
 
 `npm install --production`
+
 `npm run build`
 
 ### Backend
@@ -26,11 +27,11 @@ SMTP_PASS=
 SECRET_KEY=
 ```
 
-`go build -o build/server`
+`go build -o server`
  
 ## Run Server
 
-`./build/server`
+`./server`
 
 Server should now be running on http://localhost:8080
 
