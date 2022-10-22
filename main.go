@@ -61,11 +61,23 @@ func main() {
 		r.Get("/private_data", protectedDataHandler) // protected api
 	})
 
-	// static files under ~/web
-	workDir, _ := os.Getwd()
-	filesDir := filepath.Join(workDir, "build")
-	fileServer(router, "/", http.Dir(filesDir))
+	// declare custom 404
+	// custom404, err := os.Open(filepath.Join(workDir, "build/custom404.html"))
+	// FsOptCustom404(custom404)
 
+	// serve static build files under /
+	FS, err := rest.NewFileServer("/", "build", rest.FsOptSPA)
+
+	if err != nil {
+		log.Printf("Error initializaing rest.NewFileServer: ", err)
+	}
+
+	router.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+		FS.ServeHTTP(w, r)
+	})
+
+	// serve static auth example front end files under /web
+	workDir, _ := os.Getwd()
 	authFilesDir := filepath.Join(workDir, "auth-example-frontend")
 	fileServer(router, "/web", http.Dir(authFilesDir))
 
@@ -117,9 +129,9 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("[DEBUG] checking if provided username exists in mongodb")
+	log.Printf("[DEBUG] checking if provided email exists in mongodb")
 
-	count, err := userCollection.CountDocuments(ctx, bson.M{"username": user.Username})
+	count, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
 	defer cancel()
 	if err != nil {
 		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to lookup username")
@@ -145,7 +157,7 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, insertErr, "failed to create new user")
 		return
 	}
-	log.Printf("[INFO] successfully added %s to mongodb %s", user.Username, resultInsertionNumber)
+	log.Printf("[INFO] successfully added %s to mongodb %s", user.Email, resultInsertionNumber)
 	rest.RenderJSON(w, rest.JSON{"message": "User successfully created"})
 	// Alternatively we could respond with our user:
 	// rest.RenderJSON(w, &user)

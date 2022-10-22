@@ -21,7 +21,7 @@ func DBinstance() *mongo.Client {
 	}
 
 	MongoDb := os.Getenv("MONGO_DB_URL")
-
+	//fmt.Fprintf("mongodb+srv://%s:%s@cluster0.1gyiabr.mongodb.net/?retryWrites=true&w=majority",os.Getenv("MONGO_DB_USER"),os.Getenv("MONGO_DB_PASSWORD"))
 	client, err := mongo.NewClient(options.Client().ApplyURI(MongoDb))
 	if err != nil {
 		log.Fatalf("[ERROR] Error creating mongo client", err)

@@ -1,6 +1,10 @@
 import { useForm } from "react-hook-form";
 import "../App.css";
 
+
+//functions
+import { register } from "../functions/register";
+
 function Registration() {
   const {
     register,
@@ -20,8 +24,10 @@ function Registration() {
 
   // Sends data after form is complete
   const onSubmit = (data) => {
-    console.log(data);
+    console.log(data);    
   };
+
+  register()
 
   return (
     <>
