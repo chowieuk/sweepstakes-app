@@ -7,18 +7,27 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "concurrently": "^7.5.0",
+    "nodemon": "^2.0.7",
     "firebase": "^9.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.4.2",
     "react-hook-form": "^7.36.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts build && go build && ./sweepstakes-app",
+    "build": "react-scripts build && go build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "webapp": "react-scripts start",
+    "backend": "nodemon --ext go --exec \"go build && ./sweepstakes-app || exit 1\"",
+    "dev": "concurrently \"npm run backend\" \"npm run webapp\"",
+    "start-windows": "npm run build && go build && sweepstakes-app.exe",
+    "backend-win": "nodemon --ext go --exec \"go build && sweepstakes-app.exe || exit 1\"",
+    "dev-win": "concurrently \"npm run backend-win\" \"npm run webapp\""
   },
   "eslintConfig": {
     "extends": [
