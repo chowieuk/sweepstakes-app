@@ -30,6 +30,7 @@ import (
 var Client *mongo.Client = repo.DBinstance()
 
 var userCollection *mongo.Collection = repo.OpenCollection(Client, "users")
+var teamCollection *mongo.Collection = repo.OpenCollection(Client, "teams")
 
 func main() {
 
@@ -59,6 +60,8 @@ func main() {
 			return user
 		})))
 		r.Get("/private_data", protectedDataHandler) // protected api
+		r.Get("/api/v1/team/{id}", singleTeamResponseHandler)
+		r.Get("/api/v1/team", allTeamsResponseHandler)
 	})
 
 	// declare custom 404
@@ -183,6 +186,52 @@ func protectedDataHandler(w http.ResponseWriter, r *http.Request) {
 		Field2: 42,
 		User:   userInfo,
 	}
+
+	rest.RenderJSON(w, res)
+}
+
+// A request on Team endpoint returns all information on a Team by id
+
+//     Http Method : GET http://chowie.uk/api/v1/team/{id}
+
+func singleTeamResponseHandler(w http.ResponseWriter, r *http.Request) {
+
+	team_id := chi.URLParam(r, "id")
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	var res entity.TeamResponse
+
+	if err := teamCollection.FindOne(ctx, bson.D{{Key: "id", Value: team_id}}).Decode(&res); err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch team")
+	}
+	defer cancel()
+
+	res.Status = "success"
+
+	rest.RenderJSON(w, res)
+}
+
+// A request on Team endpoint returns all information about all Teams
+
+//     Http Method : GET http://chowie.uk/api/v1/team
+
+func allTeamsResponseHandler(w http.ResponseWriter, r *http.Request) {
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+	cursor, err := teamCollection.Find(ctx, bson.M{})
+	defer cancel()
+	if err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch teams")
+	}
+
+	var res entity.TeamResponse
+
+	if err = cursor.All(ctx, &res.Teams); err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to parse teams")
+	}
+	defer cancel()
+	res.Status = "success"
 
 	rest.RenderJSON(w, res)
 }
