@@ -4,9 +4,11 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import "./App.css";
 
-// Components
-import Registration from "./components/Registration";
-import Welcome from "./components/Welcome";
+// Page Components
+import Registration from "./pages/Registration";
+import Welcome from "./pages/Welcome";
+import Matches from "./pages/Matches";
+import Leaderboard from "./pages/Leaderboard";
 // import { db } from "./firebase-config";
 // import {
 //   collection,
@@ -47,7 +49,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Welcome />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/registration" element={<Registration />} />
+        <Route path="/matches" element={<Matches />} />
       </Routes>
     </BrowserRouter>
   );

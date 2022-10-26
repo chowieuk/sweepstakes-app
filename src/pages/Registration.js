@@ -1,9 +1,6 @@
 import { useForm } from "react-hook-form";
 import "../App.css";
-
-
-//functions
-import { register } from "../functions/register";
+import "./Registration.css";
 
 function Registration() {
   const {
@@ -24,14 +21,12 @@ function Registration() {
 
   // Sends data after form is complete
   const onSubmit = (data) => {
-    console.log(data);    
+    console.log(data);
   };
-
-  register()
 
   return (
     <>
-      <div className="container">
+      <div className="reg-container">
         <div className="title">2022 World Cup Sweepstakes</div>
         <div className="content">
           {/* change action to redirect */}

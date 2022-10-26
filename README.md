@@ -26,6 +26,14 @@ SMTP_PASS=
 SECRET_KEY=
 ```
 
+`install go`
+brew install go
+
+go mod tidy 
+
+
+
+
 `go build -o build/server`
  
 ## Run Server
