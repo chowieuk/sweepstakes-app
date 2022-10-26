@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// User is a reduced model of objects that will be retrived or inserted into the DB
+// User is a reduced model for user objects that will be retrived or inserted into our repo
 type User struct {
 	ID         primitive.ObjectID `bson:"_id"`
 	Created_at time.Time          `json:"created_at"`
@@ -15,5 +15,5 @@ type User struct {
 	Email      string             `json:"email"`
 	Password   string             `json:"password"`
 	User_id    string             `json:"user_id"`
-	//Nation     string             `json:"nation"`
+	Team_id    string             `json:"team_id"`
 }
