@@ -11,7 +11,6 @@
   border-radius: 5px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
-
 .submitButton::hidden {
   display: none;
 }
@@ -34,7 +33,6 @@ form .submitButton input {
   transition: all 1000ms ease;
   background: linear-gradient(135deg, #71b7e6, #9b59b6);
 }
-
 form .submitButton input:hover {
   /* transform: scale(0.99); */
   background: linear-gradient(-135deg, #71b7e6, #9b59b6);
@@ -46,18 +44,15 @@ form .submitButton input:hover {
   justify-content: space-between;
   margin: 20px 0 12px 0;
 }
-
 form .user-details .input-box {
   margin-bottom: 15px;
-  width: calc(50% - 20px);
+  width: calc(100% / 2 - 20px);
 }
-
 form .input-box span.details {
   display: block;
   font-weight: 500;
   margin-bottom: 5px;
 }
-
 .user-details .input-box input {
   height: 45px;
   width: 100%;
@@ -69,10 +64,7 @@ form .input-box span.details {
   border-bottom-width: 2px;
   transition: all 0.3s ease;
 }
-
 .user-details .input-box input:focus,
 .user-details .input-box input:valid {
   border-color: #9b59b6;
 }
-
-/*# sourceMappingURL=Registration.css.map */
