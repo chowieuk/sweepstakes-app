@@ -1,13 +1,24 @@
 # Sweepstakes-app
 
+Note: We've made substantial changes to our packages.json, and have moved all of the build scripts there. Below needs to be updated.
+
 ## Building
 
 ### Frontend
 
 `npm install --production`
+
 `npm run build`
 
 ### Backend
+
+install go
+
+`brew install go`
+
+install packages
+
+`go mod tidy`
 
 Populate `.env.production.local`
 Current version includes:
@@ -26,19 +37,13 @@ SMTP_PASS=
 SECRET_KEY=
 ```
 
-`install go`
-brew install go
+build server binary
 
-go mod tidy 
-
-
-
-
-`go build -o build/server`
+`go build -o build`
  
 ## Run Server
 
-`./build/server`
+`./server`
 
 Server should now be running on http://localhost:8080
 
