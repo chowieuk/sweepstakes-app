@@ -48,9 +48,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+{/* public routes */}
         <Route path="/" element={<Welcome />} />
+        <Route path="/register" element={<Registration />} />
+{/* logged on routes */}
         <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/registration" element={<Registration />} />
         <Route path="/matches" element={<Matches />} />
       </Routes>
     </BrowserRouter>
