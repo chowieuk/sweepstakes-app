@@ -24,7 +24,7 @@ function req(endpoint, data = {}) {
     cloneData.headers.append("X-XSRF-TOKEN", token);
   }
 
-  return fetch(endpoint, cloneData).then(resp => {
+  return fetch(endpoint, cloneData).then((resp) => {
     if (resp.status >= 400) {
       throw resp;
     }
@@ -37,7 +37,7 @@ function getProviders() {
 }
 
 function getUser() {
-  return req("/auth/user").catch(e => {
+  return req("/auth/user").catch((e) => {
     if (e.status && e.status === 401) return null;
     throw e;
   });
@@ -68,8 +68,7 @@ function login(prov) {
           win.close();
           clearInterval(interval);
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     }, 100);
   });
 }
@@ -82,7 +81,9 @@ function loginAnonymously(username) {
 
 function loginMongo(username, password) {
   return fetch(
-    `/auth/mongo/login?id=sweepstakes&user=${encodeURIComponent(username)}&passwd=${encodeURIComponent(password)}`
+    `/auth/mongo/login?id=sweepstakes&user=${encodeURIComponent(
+      username
+    )}&passwd=${encodeURIComponent(password)}`
   );
 }
 
@@ -134,7 +135,7 @@ function getAnonymousLoginForm(onSubmit) {
   submit.value = "Log in";
   submit.className = "anon-form__submit";
 
-  const onValueChange = val => {
+  const onValueChange = (val) => {
     const reason = getUsernameInvalidReason(val);
     if (reason === null) {
       submit.disabled = false;
@@ -147,14 +148,14 @@ function getAnonymousLoginForm(onSubmit) {
 
   onValueChange(input.value);
 
-  input.addEventListener("input", e => {
+  input.addEventListener("input", (e) => {
     onValueChange(e.target.value);
   });
 
   form.appendChild(input);
   form.appendChild(submit);
 
-  form.addEventListener("submit", e => {
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
     onSubmit(input.value);
   });
@@ -201,7 +202,7 @@ function getMongoLoginForm(onSubmit) {
   form.appendChild(passwordInput);
   form.appendChild(submit);
 
-  form.addEventListener("submit", e => {
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
     onSubmit(usernameInput.value, passwordInput.value);
   });
@@ -229,28 +230,28 @@ function getEmailLoginForm(onSubmit) {
 
   const formValidation = ["Enter username", "Enter email"];
 
-  const onUserNameValueChange = val => {
+  const onUserNameValueChange = (val) => {
     const reason = getUsernameInvalidReason(val);
     formValidation[0] = reason === null ? null : reason;
-    submit.title = formValidation.filter(x => x !== null).join("\n") || "";
+    submit.title = formValidation.filter((x) => x !== null).join("\n") || "";
     submit.disabled = submit.title.length > 0;
   };
 
-  const onEmailValueChange = val => {
+  const onEmailValueChange = (val) => {
     const reason = getEmailInvalidReason(val);
     formValidation[1] = reason === null ? null : reason;
-    submit.title = formValidation.filter(x => x !== null).join("\n") || "";
+    submit.title = formValidation.filter((x) => x !== null).join("\n") || "";
     submit.disabled = submit.title.length > 0;
   };
 
-  submit.title = formValidation.filter(x => x !== null).join("\n") || "";
+  submit.title = formValidation.filter((x) => x !== null).join("\n") || "";
   submit.disabled = submit.title.length > 0;
 
-  usernameInput.addEventListener("input", e => {
+  usernameInput.addEventListener("input", (e) => {
     onUserNameValueChange(e.target.value);
   });
 
-  emailInput.addEventListener("input", e => {
+  emailInput.addEventListener("input", (e) => {
     onEmailValueChange(e.target.value);
   });
 
@@ -258,7 +259,7 @@ function getEmailLoginForm(onSubmit) {
   form.appendChild(emailInput);
   form.appendChild(submit);
 
-  form.addEventListener("submit", e => {
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
     onSubmit(usernameInput.value, emailInput.value);
   });
@@ -286,7 +287,7 @@ function getEmailTokenLoginForm(onSubmit) {
   submit.value = "Submit";
   submit.className = "email-form__submit";
 
-  const onTokenValueChange = val => {
+  const onTokenValueChange = (val) => {
     const reason = getTokenInvalidReason(val);
     if (reason !== null) {
       submit.title = reason;
@@ -299,14 +300,14 @@ function getEmailTokenLoginForm(onSubmit) {
 
   onTokenValueChange(tokenInput.value);
 
-  tokenInput.addEventListener("input", e => {
+  tokenInput.addEventListener("input", (e) => {
     onTokenValueChange(e.target.value);
   });
 
   form.appendChild(tokenInput);
   form.appendChild(submit);
 
-  form.addEventListener("submit", e => {
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
     onSubmit(tokenInput.value);
   });
@@ -320,47 +321,48 @@ function getEmailTokenLoginForm(onSubmit) {
 }
 
 async function getTelegramLoginForm() {
-  let {token, bot} = await fetch("/auth/telegram/login").then(r => r.json())
+  let { token, bot } = await fetch("/auth/telegram/login").then((r) =>
+    r.json()
+  );
 
-  let form = document.createElement("div")
-  form.className = "anon-form login__anon-form"
-  form.style.display = "none"
+  let form = document.createElement("div");
+  form.className = "anon-form login__anon-form";
+  form.style.display = "none";
 
-  let link = document.createElement("a")
-  link.href = `tg://resolve?domain=${bot}&start=${token}`
-  link.innerHTML = "Click the link and press start"
+  let link = document.createElement("a");
+  link.href = `tg://resolve?domain=${bot}&start=${token}`;
+  link.innerHTML = "Click the link and press start";
 
-  shouldPoll = false
+  shouldPoll = false;
   link.onclick = (e) => {
-    e.stopPropagation()
-    shouldPoll = true
-  }
+    e.stopPropagation();
+    shouldPoll = true;
+  };
 
   setInterval(() => {
     if (!shouldPoll) {
-      return
+      return;
     }
 
     // Poll login endpoint until user confirms login request
-    fetch(`/auth/telegram/login?token=${token}`)
-      .then(resp => {
-        if (resp.status == 200) {
-          // Success
-          window.location.reload()
-        }
-      })
+    fetch(`/auth/telegram/login?token=${token}`).then((resp) => {
+      if (resp.status == 200) {
+        // Success
+        window.location.reload();
+      }
+    });
   }, 1000);
 
-  form.appendChild(link)
+  form.appendChild(link);
 
-  const stopPolling = () => shouldPoll = false
-  return { form, stopPolling }
+  const stopPolling = () => (shouldPoll = false);
+  return { form, stopPolling };
 }
 
 function errorHandler(err) {
   const status = document.querySelector(".status__label");
   if (err instanceof Response) {
-    err.text().then(text => {
+    err.text().then((text) => {
       try {
         const data = JSON.parse(text);
         if (data.error) {
@@ -368,8 +370,7 @@ function errorHandler(err) {
           console.error(data.error);
           return;
         }
-      } catch {
-      }
+      } catch {}
       status.textContent = text;
       console.error(text);
     });
@@ -380,11 +381,10 @@ function errorHandler(err) {
 }
 
 function getLoginLinks() {
-  let formSwitcher = () => {
-  };
+  let formSwitcher = () => {};
 
-  return getProviders().then(providers =>
-    providers.map(prov => {
+  return getProviders().then((providers) =>
+    providers.map((prov) => {
       let a;
       if (prov === "anonymous") {
         a = document.createElement("span");
@@ -395,7 +395,7 @@ function getLoginLinks() {
         textEl.textContent = "Login with " + prov;
         textEl.className = "pseudo";
         a.appendChild(textEl);
-        textEl.addEventListener("click", e => {
+        textEl.addEventListener("click", (e) => {
           const display = form.style.display;
           formSwitcher();
           if (display === "none") {
@@ -406,46 +406,44 @@ function getLoginLinks() {
             form.querySelector(".anon-form__input").focus();
           } else {
             form.style.display = "none";
-            formSwitcher = () => {
-            };
+            formSwitcher = () => {};
           }
         });
 
-        const form = getAnonymousLoginForm(username => {
+        const form = getAnonymousLoginForm((username) => {
           loginAnonymously(username)
             .then(() => {
               window.location.replace(window.location.href);
             })
             .catch(errorHandler);
-        }); 
+        });
         form.style.display = "none";
         form.className = "anon-form login__anon-form";
 
         a.appendChild(form);
-        } else if (prov === "mongo") {
-            a = document.createElement("span");
-            a.dataset.provider = prov;
-            a.className = "login__prov";
-    
-            const textEl = document.createElement("span");
-            textEl.textContent = "Login with " + prov;
-            textEl.className = "pseudo";
-            a.appendChild(textEl);
-            textEl.addEventListener("click", e => {
-              const display = mongoForm.style.display;
-              formSwitcher();
-              if (display === "none") {
-                mongoForm.style.display = "block";
-                formSwitcher = () => {
-                  mongoForm.style.display = "none";
-                };
-                mongoForm.querySelector(".mongo-form__input").focus();
-              } else {
-                mongoForm.style.display = "none";
-                formSwitcher = () => {
-                };
-              }
-            });
+      } else if (prov === "mongo") {
+        a = document.createElement("span");
+        a.dataset.provider = prov;
+        a.className = "login__prov";
+
+        const textEl = document.createElement("span");
+        textEl.textContent = "Login with " + prov;
+        textEl.className = "pseudo";
+        a.appendChild(textEl);
+        textEl.addEventListener("click", (e) => {
+          const display = mongoForm.style.display;
+          formSwitcher();
+          if (display === "none") {
+            mongoForm.style.display = "block";
+            formSwitcher = () => {
+              mongoForm.style.display = "none";
+            };
+            mongoForm.querySelector(".mongo-form__input").focus();
+          } else {
+            mongoForm.style.display = "none";
+            formSwitcher = () => {};
+          }
+        });
         const mongoForm = getMongoLoginForm((username, password) => {
           loginMongo(username, password)
             .then(() => {
@@ -466,7 +464,7 @@ function getLoginLinks() {
         textEl.textContent = "Login with " + prov;
         textEl.className = "pseudo";
         a.appendChild(textEl);
-        textEl.addEventListener("click", e => {
+        textEl.addEventListener("click", (e) => {
           const diplay = formStage1.style.display;
           formSwitcher();
           if (diplay === "none") {
@@ -480,8 +478,7 @@ function getLoginLinks() {
           } else {
             formStage1.style.display = "none";
             formStage2.style.display = "none";
-            formSwitcher = () => {
-            };
+            formSwitcher = () => {};
           }
         });
 
@@ -498,12 +495,12 @@ function getLoginLinks() {
         formStage1.className = "email-form login__email-form";
         a.appendChild(formStage1);
 
-        const formStage2 = getEmailTokenLoginForm(token => {
+        const formStage2 = getEmailTokenLoginForm((token) => {
           loginViaEmailToken(token)
             .then(() => {
               window.location.replace(window.location.href);
             })
-            .catch(e => {
+            .catch((e) => {
               formStage1.classList.remove("hidden");
               formStage2.reset();
               formStage2.classList.add("hidden");
@@ -524,33 +521,32 @@ function getLoginLinks() {
         a.appendChild(textEl);
 
         getTelegramLoginForm()
-          .then(({ form, stopPolling}) => {
-            a.addEventListener("click", e => {
+          .then(({ form, stopPolling }) => {
+            a.addEventListener("click", (e) => {
               const display = form.style.display;
               formSwitcher();
               if (display === "none") {
                 form.style.display = "block";
                 formSwitcher = () => {
-                  stopPolling()
+                  stopPolling();
                   form.style.display = "none";
                 };
-
               } else {
                 form.style.display = "none";
-                stopPolling()
-                formSwitcher = () => { };
+                stopPolling();
+                formSwitcher = () => {};
               }
             });
 
-            a.appendChild(form)
+            a.appendChild(form);
           })
-          .catch(console.error)
+          .catch(console.error);
       } else {
         a = document.createElement("span");
         a.dataset.provider = prov;
         a.textContent = "Login with " + prov;
         a.className = "pseudo login__prov";
-        a.addEventListener("click", e => {
+        a.addEventListener("click", (e) => {
           formSwitcher();
           e.preventDefault();
           login(prov)
@@ -570,7 +566,7 @@ function getLogoutLink() {
   a.href = "#";
   a.textContent = "Logout";
   a.className = "login__prov";
-  a.addEventListener("click", e => {
+  a.addEventListener("click", (e) => {
     e.preventDefault();
     req("/auth/logout")
       .then(() => {
@@ -635,11 +631,11 @@ function main() {
     document.body.textContent = "Logged in!";
     return;
   }
-  return getUser().then(user => {
+  return getUser().then((user) => {
     const loginContainer = document.querySelector(".login");
     const statusElement = document.querySelector(".status__label");
     if (!user) {
-      getLoginLinks().then(links => {
+      getLoginLinks().then((links) => {
         for (let link of links) {
           loginContainer.appendChild(link);
         }
@@ -653,7 +649,7 @@ function main() {
     infoEl.appendChild(getUserInfoFragment(user));
 
     req("/private_data")
-      .then(data => {
+      .then((data) => {
         data = JSON.stringify(data, null, "  ");
         const el = document.createElement("pre");
         el.textContent = data;
@@ -669,6 +665,6 @@ function main() {
   });
 }
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
 });

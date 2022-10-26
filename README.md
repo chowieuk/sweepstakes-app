@@ -40,7 +40,7 @@ SECRET_KEY=
 build server binary
 
 `go build -o build`
- 
+
 ## Run Server
 
 `./server`
@@ -61,7 +61,7 @@ Open routes:
 
 Protected routes:
 
-`/private_data` 
+`/private_data`
 
 ## API Specification
 
@@ -100,13 +100,14 @@ You can only use these providers if you've set the relevant environment variable
 
 #### oauth2 - dev
 
-For *development purposes only* an dummy oauth2 dev server is provided. You can login with any username. Notice that you'll get more info if you login with `dev_admin` as the username.
+For _development purposes only_ an dummy oauth2 dev server is provided. You can login with any username. Notice that you'll get more info if you login with `dev_admin` as the username.
 
 ## Data Model
 
 Here's the current model for the User entity. At this time I'm not handling email, just username and password
 
 // User is a reduced model of objects that will be retrived or inserted into the DB
+
 ```
 type User struct {
 	ID         primitive.ObjectID `bson:"_id"`
@@ -129,5 +130,5 @@ I have yet to add a data model for Nations.
 - Start building out required features
 - Consider local copy of World Cup 2022 API, + cronjob to populate the database within rate limits
 - Consider rate limiting / throttling:
-	- registration attempts
-	- login attempts
+  - registration attempts
+  - login attempts
