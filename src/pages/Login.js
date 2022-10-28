@@ -25,9 +25,11 @@ export default function Login() {
         }),
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers":
-            "Origin, X-Requested-With, Content-Type, Accept",
+          "Accept" : "application/json"
+          // Consider adding "Authorization" : "some value" (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization)
+          // These two below are for responses, not requests.
+          //"Access-Control-Allow-Origin": "*",
+          //"Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
         },
       });
     } catch (err) {}
