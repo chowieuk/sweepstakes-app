@@ -14,6 +14,7 @@ import (
 	"github.com/chowieuk/sweepstakes-app/backend/service"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/go-pkgz/auth/middleware"
 	"github.com/go-pkgz/auth/token"
 	log "github.com/go-pkgz/lgr"
@@ -50,8 +51,18 @@ func main() {
 	router := chi.NewRouter()
 	// add some external middlewares from go-pkgz/rest
 	router.Use(rest.AppInfo("sweepstakes", "chowieuk, patrickreynoldscoding", "1.0.0"), rest.Ping)
-	router.Use(logger.New(logger.Log(log.Default()), logger.WithBody, logger.Prefix("[INFO]")).Handler) // log all http requests                                                             // open page
-	router.Post("/register", registrationHandler)                                                       // post registration route
+	router.Use(logger.New(logger.Log(log.Default()), logger.WithBody, logger.Prefix("[INFO]")).Handler) // log all http requests
+	// Basic CORS
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://chowie.uk", "http://localhost:3000", "http://localhost:8080"}, // Use this to allow specific origin hosts
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		Debug:            true,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
+	router.Post("/register", registrationHandler) // post registration route
 	router.Group(func(r chi.Router) {
 		r.Use(m.Auth)
 		r.Use(m.UpdateUser(middleware.UserUpdFunc(func(user token.User) token.User {
