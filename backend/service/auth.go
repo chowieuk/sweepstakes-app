@@ -121,9 +121,12 @@ func mongoAuthProvider(collection *mongo.Collection) provider.CredCheckerFunc {
 // checkMongo compares given credentials with our mongodb collection
 func checkMongo(collection *mongo.Collection, user, password string) (ok bool, err error) {
 	log.Printf("[INFO] checking provided credentials against mongodb")
+	if user == "" {
+		log.Printf("[DEBUG] user not provided: %s", user)
+	}
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	var foundUser entity.User
-	err = collection.FindOne(ctx, bson.M{"username": user}).Decode(&foundUser)
+	err = collection.FindOne(ctx, bson.M{"email": user}).Decode(&foundUser)
 
 	defer cancel()
 	if err != nil {

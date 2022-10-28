@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
-import "../App.css";
-import "./Registration.css";
+import "./Registration.scss";
 
 function Registration() {
+
   const {
     register,
     handleSubmit,
@@ -19,9 +19,29 @@ function Registration() {
     }
   };
 
+  // register function
+  const registerUser = async (data) => {
+    try {
+      const res = await fetch("http://localhost:8080/register", {
+        method: "POST",
+        body: JSON.stringify({
+          full_name: data.name,
+          email: data.email,
+          password: data.password,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "Origin, X-Requested-With, Content-Type, Accept",
+        },
+      });
+    } catch (err) {}
+  };
+
   // Sends data after form is complete
   const onSubmit = (data) => {
-    console.log(data);
+    registerUser(data);
   };
 
   return (

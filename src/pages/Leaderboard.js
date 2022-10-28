@@ -5,7 +5,6 @@ import Spinner from "react-bootstrap/Spinner";
 //components
 import LeaderboardCard from "../components/LeaderboardCard";
 
-
 // Import Dummy Data DELETE LATER
 const dummyStandingData = require("./standingdummydata.json");
 
@@ -52,27 +51,21 @@ export default function Leaderboard() {
     //   .then(() => setLoading(false))
     //   .catch(console.error);
 
-    setLoading(false)
-
-
+    setLoading(false);
   }, []);
-
-
-
-
 
   return (
     <div>
       {loading ? (
         <Spinner animation="border" variant="primary" />
       ) : (
-        dummyStandingData.data.map((group) => { // UPDATE THIS TO standingData and uncomment the above useEffect
+        dummyStandingData.data.map((group) => {
+          // UPDATE THIS TO standingData and uncomment the above useEffect
           return (
-            <div key={group._id}> 
+            <div key={group._id}>
               {group.teams.map((team) => {
-                return <LeaderboardCard team={team} key={team.team_id}/>
+                return <LeaderboardCard team={team} key={team.team_id} />;
               })}
-
             </div>
           );
         })
