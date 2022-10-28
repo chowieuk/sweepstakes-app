@@ -6,6 +6,7 @@ import "./App.css";
 
 // Page Components
 import Registration from "./pages/Registration";
+import Login from "./pages/Login";
 import Welcome from "./pages/Welcome";
 import Matches from "./pages/Matches";
 import Leaderboard from "./pages/Leaderboard";
@@ -48,9 +49,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+{/* public routes */}
         <Route path="/" element={<Welcome />} />
+        <Route path="/register" element={<Registration />} />
+        <Route path="/login" element={<Login />} />
+{/* logged on routes */}
         <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/registration" element={<Registration />} />
         <Route path="/matches" element={<Matches />} />
       </Routes>
     </BrowserRouter>
