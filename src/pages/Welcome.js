@@ -23,7 +23,7 @@ export default function Welcome() {
 
         <div className="button-container">
           <Link
-            to="/registration"
+            to="/register"
             style={{ textDecoration: "none", color: "none" }}
           >
             <div className="button" action={"/registration"}>
@@ -31,7 +31,7 @@ export default function Welcome() {
             </div>
           </Link>
           <Link
-            to="/registration"
+            to="/login"
             style={{ textDecoration: "none", color: "none" }}
           >
             <div className="button" action={"/"}>
