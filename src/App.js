@@ -6,6 +6,8 @@ import "./App.css";
 
 // Page Components
 import Registration from "./pages/Registration";
+import RegistrationSuccessful from "./pages/Registersuccessful";
+import RegistrationFail from "./pages/RegisterFail";
 import Login from "./pages/Login";
 import Welcome from "./pages/Welcome";
 import Matches from "./pages/Matches";
@@ -52,7 +54,10 @@ function App() {
 {/* public routes */}
         <Route path="/" element={<Welcome />} />
         <Route path="/register" element={<Registration />} />
+        <Route path="/success" element={<RegistrationSuccessful />} />
+        <Route path="/fail" element={<RegistrationFail />} />
         <Route path="/login" element={<Login />} />
+
 {/* logged on routes */}
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/matches" element={<Matches />} />
