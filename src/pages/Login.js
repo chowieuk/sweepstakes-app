@@ -1,6 +1,8 @@
 import React from 'react'
 import { useForm } from "react-hook-form";
 
+import './Login.css'
+
 export default function Login() {
 
 
@@ -43,32 +45,34 @@ export default function Login() {
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="user-details">
-                 {/* email */}
-              <div className="input-box">
-                <span className="details">Email</span>
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  {...register("email", { required: true })}
-                />
-              </div>
-              {/* password */}
-              <div className="input-box">
-                <span className="details">Password</span>
-                <input
-                  type="password"
-                  placeholder="Enter your password"
-                  {...register("password", { required: true })}
-                />
-                {/* {errors?.password?.type === "required" && (
-                  <p>This field is required</p>
-                )} */}
-              </div>
+        <div className="login-container">
+          <div className="login-user-details">
+                  {/* email */}
+                <div className="login-input-box">
+                  <span className="details">Email</span>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    {...register("email", { required: true })}
+                  />
+                </div>
+                {/* password */}
+                <div className="login-input-box">
+                  <span className="details">Password</span>
+                  <input
+                    type="password"
+                    placeholder="Enter your password"
+                    {...register("password", { required: true })}
+                  />
+                  {/* {errors?.password?.type === "required" && (
+                    <p>This field is required</p>
+                  )} */}
+                </div>
 
-            <div className="submitButton">
-              <input type="submit" value="Register" disabled={!isValid} />
-            </div>
+              <div className="submitButton">
+                <input type="submit" value="Login" disabled={!isValid} />
+              </div>
+          </div>
         </div>
       </form>
     </div>

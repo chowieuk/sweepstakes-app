@@ -24,6 +24,7 @@
         filter: brightness(0.2) invert(1);
       }
       .welcome-text {
+        color: white;
         flex-direction: row;
         text-align: center;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -38,6 +39,7 @@
       padding: 2px;
       justify-content: center;
       .welcome-message {
+        color: white;
         display: flex;
         justify-content: center;
       }
