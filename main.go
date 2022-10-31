@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -161,7 +162,8 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 	user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 	user.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 	user.ID = primitive.NewObjectID()
-	user.User_id = user.ID.Hex()
+	userCount, _ := userCollection.CountDocuments(ctx, bson.D{})
+	user.User_id = fmt.Sprint(userCount + 1)
 
 	err = allocateTeam(&user, ctx)
 	if err != nil {
