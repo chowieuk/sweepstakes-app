@@ -190,11 +190,15 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 func allocateTeam(user *entity.User, ctx context.Context) error {
 
 	var team entity.TeamData
+
 	// Using Aggregation / samples
 
-	// matchStage := bson.D{{"$match", bson.D{{"user_id", nil}}}}
+	nextAvailableTeam, err := teamCollection.Aggregate(ctx, mongo.Pipeline{
+		bson.D{{Key: "$match", Value: bson.D{{Key: "user_id", Value: nil}}}},
+		bson.D{{Key: "$sample", Value: bson.D{{Key: "size", Value: 1}}}},
+	})
 
-	// nextAvailableTeam := teamCollection.Aggregate(ctx, matchStage)
+	nextAvailableTeam.Decode(&team)
 
 	// Using Find.
 	// cursor, err := teamCollection.Find(
@@ -205,7 +209,7 @@ func allocateTeam(user *entity.User, ctx context.Context) error {
 
 	// Using FindOne
 
-	err := teamCollection.FindOne(ctx, bson.D{{Key: "user_id", Value: nil}}).Decode(&team)
+	// err := teamCollection.FindOne(ctx, bson.D{{Key: "user_id", Value: nil}}).Decode(&team)
 
 	if err != nil {
 		log.Printf("[DEBUG] failed when attempting to find an available team")
