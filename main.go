@@ -193,14 +193,31 @@ func allocateTeam(user *entity.User, ctx context.Context) error {
 
 	// Using Aggregation / samples
 
-	nextAvailableTeam, err := teamCollection.Aggregate(ctx, mongo.Pipeline{
-		bson.D{{Key: "$match", Value: bson.D{{Key: "user_id", Value: nil}}}},
-		bson.D{{Key: "$sample", Value: bson.D{{Key: "size", Value: 1}}}},
-	})
+	//matchStage := bson.D{{"$match", bson.D{{"user_id", nil}}}}
+	//matchStage := bson.D{{"$match", bson.D{{"user_id", primitive.Null{}}}}}
+	//sampleStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
 
-	nextAvailableTeam.Decode(&team)
+	// cursor, err := teamCollection.Aggregate(ctx, mongo.Pipeline{
+	// 	bson.D{{"$match", bson.D{{"user_id", primitive.Null{}}}}},
+	// 	bson.D{{"$sample", bson.D{{"size", 1}}}},
+	// })
+	// if err != nil {
+	// 	log.Printf("[DEBUG] error durring aggregation: ", err)
+	// }
 
-	// Using Find.
+	// var results []bson.M
+	// if err = cursor.All(context.TODO(), &results); err != nil {
+	// 	panic(err)
+	// }
+
+	// for _, result := range results {
+	// 	fmt.Printf("Name: %v \nID: %v \n\n", result["Name"], result["ID"])
+	// }
+
+	// log.Printf("[DEBUG] team name: %s", team.Name)
+
+	// Using Find
+
 	// cursor, err := teamCollection.Find(
 	// 	ctx,
 	// 	bson.D{
@@ -209,14 +226,22 @@ func allocateTeam(user *entity.User, ctx context.Context) error {
 
 	// Using FindOne
 
-	// err := teamCollection.FindOne(ctx, bson.D{{Key: "user_id", Value: nil}}).Decode(&team)
+	err := teamCollection.FindOne(ctx, bson.D{{Key: "user_id", Value: nil}}).Decode(&team)
 
 	if err != nil {
 		log.Printf("[DEBUG] failed when attempting to find an available team")
 		return err
 	}
 
-	teamCollection.UpdateByID(ctx, team.ID, bson.D{{Key: "user_id", Value: user.User_id}})
+	result, err := teamCollection.UpdateByID(ctx, team.ID.Hex(), bson.D{{
+		Key: "$set",
+		Value: bson.D{{
+			Key:   "user_id",
+			Value: user.User_id}}}})
+
+	if !(result.ModifiedCount > 0) {
+		log.Printf("[DEBUG] no records were modified")
+	}
 
 	if err != nil {
 		log.Printf("[DEBUG] failed when attempting to update team %s (Object ID: %s) with user id %s ", team.Name, team.ID, user.User_id)
