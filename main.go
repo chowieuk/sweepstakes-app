@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -31,6 +32,7 @@ import (
 var Client *mongo.Client = repo.DBinstance()
 
 var userCollection *mongo.Collection = repo.OpenCollection(Client, "users")
+var teamCollection *mongo.Collection = repo.OpenCollection(Client, "teams")
 
 func main() {
 
@@ -160,7 +162,18 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 	user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 	user.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 	user.ID = primitive.NewObjectID()
-	user.User_id = user.ID.Hex()
+	userCount, _ := userCollection.CountDocuments(ctx, bson.D{})
+	user.User_id = fmt.Sprint(userCount + 1)
+
+	err = allocateTeam(&user, ctx)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "all teams have been allocated")
+			return
+		}
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to allocate team")
+		return
+	}
 
 	resultInsertionNumber, insertErr := userCollection.InsertOne(ctx, user)
 	defer cancel()
@@ -172,6 +185,44 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 	rest.RenderJSON(w, rest.JSON{"message": "User successfully created"})
 	// Alternatively we could respond with our user:
 	// rest.RenderJSON(w, &user)
+}
+
+func allocateTeam(user *entity.User, ctx context.Context) error {
+
+	var team entity.TeamData
+	// Using Aggregation / samples
+
+	// matchStage := bson.D{{"$match", bson.D{{"user_id", nil}}}}
+
+	// nextAvailableTeam := teamCollection.Aggregate(ctx, matchStage)
+
+	// Using Find.
+	// cursor, err := teamCollection.Find(
+	// 	ctx,
+	// 	bson.D{
+	// 		{"user_id", nil},
+	// 	})
+
+	// Using FindOne
+
+	err := teamCollection.FindOne(ctx, bson.D{{Key: "user_id", Value: nil}}).Decode(&team)
+
+	if err != nil {
+		log.Printf("[DEBUG] failed when attempting to find an available team")
+		return err
+	}
+
+	teamCollection.UpdateByID(ctx, team.ID, bson.D{{Key: "user_id", Value: user.User_id}})
+
+	if err != nil {
+		log.Printf("[DEBUG] failed when attempting to update team %s (Object ID: %s) with user id %s ", team.Name, team.ID, user.User_id)
+		return err
+	}
+
+	user.Team_id = team.Team_id
+	log.Printf("[INFO] successfully allocated %s (id %s) to %s (id %s)\n", team.Name, team.Team_id, user.Full_Name, user.User_id)
+	// log.Printf("[INFO] available teams left: %s)\n",)
+	return nil
 }
 
 // GET /private_data returns json with user info and ts

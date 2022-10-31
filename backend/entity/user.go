@@ -15,5 +15,5 @@ type User struct {
 	Email      string             `json:"email"`
 	Password   string             `json:"password"`
 	User_id    string             `json:"user_id"`
-	//Nation     string             `json:"nation"`
+	Team_id    string             `json:"team_id"`
 }
