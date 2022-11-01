@@ -16,11 +16,11 @@ type TeamResponse struct {
 // https://github.com/raminmr/free-api-worldcup2022
 
 type TeamData struct {
-	ID       primitive.ObjectID `json:"_id" bson:"_id"`
+	ObjectID primitive.ObjectID `json:"_id" bson:"_id"`
 	Name     string             `json:"name_en" bson:"name_en"`
 	Flag     string             `json:"flag" bson:"flag"`
 	FifaCode string             `json:"fifa_code" bson:"fifa_code"`
 	ISO2     string             `json:"iso2" bson:"iso2"`
 	Group    string             `json:"groups" bson:"groups"`
-	Team_id  string             `json:"id" bson:"id"`
+	ID       string             `json:"id" bson:"id"`
 }
