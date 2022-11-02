@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha1"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -69,29 +70,33 @@ func main() {
 		r.Use(m.Auth)
 		r.Use(m.UpdateUser(middleware.UserUpdFunc(func(user token.User) token.User {
 
+			// Check if the user is in the db
 			inDb, err := UserInDb(user)
 			if err != nil {
 				log.Printf("[DEBUG] error checking if user exists in db: %v", err)
 			}
 			if !inDb {
 				log.Printf("[INFO] user doesn't exist exist in db. Adding user.")
+				// Non social login users must be in the db
 				err = AddSocialUser(user)
 				if err != nil {
 					log.Printf("[DEBUG] failed adding social user to db: %v", err)
 				}
 
 			}
+
+			// Check if the user has been assigned a team
+			// As of writing only social login users can login without being assigned a team
 			team, err := GetUserTeam(user)
 			if err != nil {
 				if err == mongo.ErrNoDocuments {
 					log.Printf("[INFO] no team assigned to user. Attempting to allocate team")
-					teamAvailable, err := CheckTeamAvailability()
+					ok, err := CheckTeamAvailability()
 					if err != nil {
 						log.Printf("[DEBUG] error checking availability")
 					}
-					if teamAvailable {
-						log.Printf("[INFO] attempting to allocate team to social user")
-						team, err = AllocateSocialTeam(user)
+					if ok {
+						team, err = AllocateTeamSocial(user)
 						if err != nil {
 							log.Printf("[DEBUG] error allocating social team: ", err)
 						}
@@ -107,7 +112,7 @@ func main() {
 				user.SetStrAttr("team_flag", team.Flag)
 			}
 			if team.Name == "" {
-				user.SetStrAttr("team_name", "unavailable")
+				user.SetStrAttr("team_name", "Waiting List")
 			}
 			return user
 		})))
@@ -174,15 +179,13 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	var user entity.User
 	err := json.NewDecoder(r.Body).Decode(&user)
-
+	defer cancel()
 	if err != nil {
-		// defer cancel() adding a defer here fixes highlighted context problem
-		// not sure about ramnificatiosn of doing so
 		rest.SendErrorJSON(w, r, log.Default(), http.StatusBadRequest, err, "failed to parse registration")
 		return
 	}
 
-	log.Printf("[DEBUG] checking if provided email exists in mongodb")
+	log.Printf("[INFO] checking if provided email exists in mongodb")
 
 	count, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
 	defer cancel()
@@ -196,6 +199,8 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("[INFO] populating client entity and allocating team")
+
 	password := service.HashPassword(user.Password)
 	user.Password = password
 
@@ -204,12 +209,20 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 	user.ObjectID = primitive.NewObjectID()
 	user.ID = "mongo_" + token.HashID(sha1.New(), user.Email)
 
-	err = allocateTeam(&user, ctx)
+	team, err := randomUnassignedTeam(ctx)
+
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "all teams have been allocated")
+		if err == errors.New("randomUnassignedTeam: all teams are assigned") {
+			//TODO: consider waiting list user story?
+			rest.SendErrorJSON(w, r, log.Default(), http.StatusForbidden, err, "all teams have been allocated")
 			return
 		}
+		log.Printf("[DEBUG] error getting random team : %v", err)
+		return
+	}
+
+	err = allocateTeam(team, &user, ctx)
+	if err != nil {
 		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to allocate team")
 		return
 	}
@@ -226,51 +239,36 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 	// rest.RenderJSON(w, &user)
 }
 
-func allocateTeam(user *entity.User, ctx context.Context) error {
+func randomUnassignedTeam(ctx context.Context) (entity.TeamData, error) {
 
 	var team entity.TeamData
 
 	// Using Aggregation / samples
 
-	//matchStage := bson.D{{"$match", bson.D{{"user_id", nil}}}}
-	//matchStage := bson.D{{"$match", bson.D{{"user_id", primitive.Null{}}}}}
-	//sampleStage := bson.D{{"$sample", bson.D{{"size", 1}}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "user_id", Value: nil}}}}
+	sampleStage := bson.D{{Key: "$sample", Value: bson.D{{Key: "size", Value: 1}}}}
 
-	// cursor, err := teamCollection.Aggregate(ctx, mongo.Pipeline{
-	// 	bson.D{{"$match", bson.D{{"user_id", primitive.Null{}}}}},
-	// 	bson.D{{"$sample", bson.D{{"size", 1}}}},
-	// })
-	// if err != nil {
-	// 	log.Printf("[DEBUG] error durring aggregation: ", err)
-	// }
+	cursor, err := teamCollection.Aggregate(ctx, mongo.Pipeline{matchStage, sampleStage})
 
-	// var results []bson.M
-	// if err = cursor.All(context.TODO(), &results); err != nil {
-	// 	panic(err)
-	// }
-
-	// for _, result := range results {
-	// 	fmt.Printf("Name: %v \nID: %v \n\n", result["Name"], result["ID"])
-	// }
-
-	// log.Printf("[DEBUG] team name: %s", team.Name)
-
-	// Using Find
-
-	// cursor, err := teamCollection.Find(
-	// 	ctx,
-	// 	bson.D{
-	// 		{"user_id", nil},
-	// 	})
-
-	// Using FindOne
-
-	err := teamCollection.FindOne(ctx, bson.D{{Key: "user_id", Value: nil}}).Decode(&team)
-
-	if err != nil {
-		log.Printf("[DEBUG] failed when attempting to find an available team")
-		return err
+	if cursor.RemainingBatchLength() < 1 {
+		log.Printf("[DEBUG] no more teams are available")
+		return entity.TeamData{Name: "Waiting List"}, errors.New("randomUnassignedTeam: all teams are assigned")
 	}
+	if err != nil {
+		log.Printf("[DEBUG] error durring aggregation: %v", err)
+		return entity.TeamData{}, err
+	}
+
+	for cursor.Next(ctx) {
+		if err := cursor.Decode(&team); err != nil {
+			log.Printf("[DEBUG] error during decode: %v", err)
+			return entity.TeamData{}, err
+		}
+	}
+	return team, nil
+}
+
+func allocateTeam(team entity.TeamData, user *entity.User, ctx context.Context) error {
 
 	result, err := teamCollection.UpdateByID(ctx, team.ObjectID.Hex(), bson.D{{
 		Key: "$set",
@@ -286,9 +284,9 @@ func allocateTeam(user *entity.User, ctx context.Context) error {
 		log.Printf("[DEBUG] failed when attempting to update team %s (Object ID: %s) with user id %s ", team.Name, team.ID, user.ID)
 		return err
 	}
+
 	user.Team_id = team.ID
 	log.Printf("[INFO] successfully allocated %s (id %s) to %s (id %s)\n", team.Name, team.ID, user.Email, user.ID)
-	// log.Printf("[INFO] available teams left: %s)\n",)
 	return nil
 }
 
@@ -316,14 +314,13 @@ func protectedDataHandler(w http.ResponseWriter, r *http.Request) {
 	rest.RenderJSON(w, res)
 }
 
-//UserInDb checks if the user exists in mongodb
-
+// UserInDb checks if the user exists in mongodb
 func UserInDb(user token.User) (bool, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
-	log.Printf("[DEBUG] checking if user %v (id %v) exists in mongodb", user.Name, user.ID)
+	log.Printf("[INFO] checking if user %v (id %v) exists in mongodb", user.Name, user.ID)
 
 	count, err := userCollection.CountDocuments(ctx, bson.M{"id": user.ID})
-	log.Printf("[DEBUG] number of records for user %v (id %v) = %v", user.Name, user.ID, count)
+	// log.Printf("[DEBUG] number of records for user %v (id %v) = %v", user.Name, user.ID, count)
 	defer cancel()
 	if err != nil {
 		return false, err
@@ -334,7 +331,7 @@ func UserInDb(user token.User) (bool, error) {
 	return false, nil
 }
 
-// Adds a social login user to our users collection
+// AddSocialUser Adds a social login user (Google or Facebook) to our users collection
 func AddSocialUser(user token.User) error {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
@@ -355,12 +352,13 @@ func AddSocialUser(user token.User) error {
 	return nil
 }
 
+// GetUserTeam provides the team associated with a token user
 func GetUserTeam(user token.User) (entity.TeamData, error) {
-	var ctx, _ = context.WithTimeout(context.Background(), 100*time.Second)
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	var team entity.TeamData
 	// attempt to find a team assigned to the user
 	err := teamCollection.FindOne(ctx, bson.M{"user_id": user.ID}).Decode(&team)
-
+	defer cancel()
 	if err != nil {
 		log.Printf("[DEBUG] failed when attempting to find an available team")
 		return entity.TeamData{}, err
@@ -368,6 +366,7 @@ func GetUserTeam(user token.User) (entity.TeamData, error) {
 	return team, nil
 }
 
+// CheckTeamAvailability returns true if a team is available
 func CheckTeamAvailability() (bool, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	log.Printf("[DEBUG] checking amount of available teams")
@@ -385,17 +384,19 @@ func CheckTeamAvailability() (bool, error) {
 	return false, nil
 }
 
-func AllocateSocialTeam(user token.User) (entity.TeamData, error) {
+// AllocateTeamSocial assigns a team to a Social user
+func AllocateTeamSocial(user token.User) (entity.TeamData, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	var team entity.TeamData
 
-	log.Printf("[DEBUG] allocating team to social user")
+	log.Printf("[INFO] attempting to allocate team to social user")
 
-	err := teamCollection.FindOne(ctx, bson.D{{Key: "user_id", Value: nil}}).Decode(&team)
+	// Note: This should only be executed after a check for team availability
+	team, err := randomUnassignedTeam(context.TODO())
 	defer cancel()
 	if err != nil {
 		log.Printf("[DEBUG] failed when attempting to find an available team")
-		return entity.TeamData{}, err
+		return team, err
 	}
 
 	result, err := teamCollection.UpdateByID(ctx, team.ObjectID.Hex(), bson.D{{
