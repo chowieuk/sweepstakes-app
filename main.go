@@ -117,6 +117,8 @@ func main() {
 			return user
 		})))
 		r.Get("/private_data", protectedDataHandler) // protected api
+		//r.Get("/api/v1/team/{id}", singleTeamResponseHandler)
+		r.Get("/api/v1/team", allTeamsResponseHandler)
 	})
 
 	// declare custom 404
@@ -442,4 +444,83 @@ func UpdateSocialUserWithTeam(user token.User, team entity.TeamData) error {
 		return err
 	}
 	return nil
+}
+
+// A request on Team endpoint returns all information on a Team by id
+
+//     Http Method : GET http://chowie.uk/api/v1/team/{id}
+
+// func singleTeamResponseHandler(w http.ResponseWriter, r *http.Request) {
+
+// 	team_id := chi.URLParam(r, "id")
+
+// 	pipeline := mongo.Pipeline{bson.D{
+// 		{"$match", bson.D{{"id", team_id}}},
+// 		{"$lookup",
+// 			bson.D{
+// 				{"from", "users"},
+// 				{"localField", "user_id"},
+// 				{"foreignField", "id"},
+// 				{"as", "user"},
+// 			},
+// 		},
+// 	}}
+
+// 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+// 	cursor, err := teamCollection.Aggregate(ctx, pipeline)
+// 	defer cancel()
+// 	for cursor.Next(ctx) {
+// 		if err := cursor.Decode(&team); err != nil {
+// 			log.Printf("[DEBUG] error during decode: %v", err)
+// 			return entity.TeamData{}, err
+// 		}
+// 	}
+
+// 	var res entity.TeamResponse
+
+// 	if err := teamCollection.FindOne(ctx, bson.D{{Key: "id", Value: team_id}}).Decode(&res); err != nil {
+// 		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch team")
+// 	}
+// 	defer cancel()
+
+// 	res.Status = "success"
+
+// 	rest.RenderJSON(w, res)
+// }
+
+// A request on Team endpoint returns all information about all Teams
+
+//     Http Method : GET http://chowie.uk/api/v1/team
+//     Http Method : GET http://localhost:8080/api/v1/team
+
+func allTeamsResponseHandler(w http.ResponseWriter, r *http.Request) {
+
+	pipeline := mongo.Pipeline{bson.D{
+		{Key: "$lookup",
+			Value: bson.D{
+				{Key: "from", Value: "users"},
+				{Key: "localField", Value: "user_id"},
+				{Key: "foreignField", Value: "id"},
+				{Key: "as", Value: "user"},
+			},
+		},
+	}}
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	cursor, err := teamCollection.Aggregate(ctx, pipeline)
+	defer cancel()
+	if err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch teams")
+	}
+
+	var res entity.TeamResponse
+
+	if err = cursor.All(ctx, &res.Teams); err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to parse teams")
+	}
+	defer cancel()
+	res.Status = "success"
+
+	rest.RenderJSON(w, res)
 }

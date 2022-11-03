@@ -23,4 +23,6 @@ type TeamData struct {
 	ISO2     string             `json:"iso2" bson:"iso2"`
 	Group    string             `json:"groups" bson:"groups"`
 	ID       string             `json:"id" bson:"id"`
+	User_id  string             `json:"user_id" bson:"user_id"`
+	User     []interface{}      `json:"user" bson:"user"`
 }
