@@ -34,7 +34,7 @@ getUserData()
     <>
       <div className="post-reg-container">
         <div className="post-reg-container-row1">
-          <div className="post-reg-text">Congratulations!</div>
+          <div className="post-reg-text">Welcome to the World Cup 2022 sweepstakes!</div>
         </div>
         <div className="post-reg-container-row2">
           <div className="post-reg-message">
