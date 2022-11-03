@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 
 import "./Registration.css";
 
-//functions
-import { getUserData } from "../functions/getUserData";
 
 
 export default function HomePageLoggedOn() {
