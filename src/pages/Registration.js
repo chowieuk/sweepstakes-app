@@ -1,8 +1,11 @@
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Navigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import "./Registration.scss";
 
 function Registration() {
+  const [redirect, setRedirect] = useState(false);
 
   const {
     register,
@@ -40,8 +43,13 @@ function Registration() {
 
   // Sends data after form is complete
   const onSubmit = (data) => {
-    registerUser(data);
+    registerUser(data)
+        .then(() => {
+      setRedirect(true)
+    })
   };
+
+  if (redirect) return <Navigate to="/success" />;
 
   return (
     <>
@@ -100,11 +108,9 @@ function Registration() {
             {watch("password_repeat") !== watch("password") && (
               <p>password do not match</p>
             )}
-            <Link to="/success">
               <div className="submitButton">
                 <input type="submit" value="Register" disabled={!isValid} />
               </div>
-            </Link>
           </form>
         </div>
       </div>
