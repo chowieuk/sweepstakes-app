@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useState } from "react";
+import { Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 import './Login.css'
 
 export default function Login() {
-
+  const [redirect, setRedirect] = useState(false);
 
 
   const {
@@ -38,9 +40,15 @@ export default function Login() {
   };
 
   const onSubmit = (data) => {
-    logonUser(data);
+
+    logonUser(data)
+        .then(() => {
+      setRedirect(true)
+    })
   };
 
+  if (redirect) return <Navigate to="/home" />;
+ 
 
   return (
     <div>
@@ -69,9 +77,10 @@ export default function Login() {
                   )} */}
                 </div>
 
-              <div className="submitButton">
-                <input type="submit" value="Login" disabled={!isValid} />
-              </div>
+                <div className="submitButton">
+                  <input type="submit" value="Login" disabled={!isValid} />
+                </div>
+
           </div>
         </div>
       </form>
