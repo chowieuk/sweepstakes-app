@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Welcome from "./pages/Welcome";
 import Matches from "./pages/Matches";
 import Leaderboard from "./pages/Leaderboard";
+import HomePageLoggedOn from "./pages/HomepageLoggedOn";
 // import { db } from "./firebase-config";
 // import {
 //   collection,
@@ -59,6 +60,7 @@ function App() {
         <Route path="/login" element={<Login />} />
 
 {/* logged on routes */}
+        <Route path="/home" element={<HomePageLoggedOn />} />        
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/matches" element={<Matches />} />
       </Routes>

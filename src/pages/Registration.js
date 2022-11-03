@@ -100,7 +100,7 @@ function Registration() {
             {watch("password_repeat") !== watch("password") && (
               <p>password do not match</p>
             )}
-            <Link to="/welcome">
+            <Link to="/success">
               <div className="submitButton">
                 <input type="submit" value="Register" disabled={!isValid} />
               </div>

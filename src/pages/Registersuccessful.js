@@ -16,7 +16,7 @@ export default function RegistrationSuccessful() {
         <div className="post-reg-container-row2">
           <div className="post-reg-message">
             You are now registered to the 2022 World Cup sweepstakes!<br/>
-            Please Login to view your team
+            Please LOGIN below to view your team
           </div>
           <Link className="button-container"
             to="/login"
