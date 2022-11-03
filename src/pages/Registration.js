@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 import "./Registration.scss";
 
 function Registration() {
@@ -99,9 +100,11 @@ function Registration() {
             {watch("password_repeat") !== watch("password") && (
               <p>password do not match</p>
             )}
-            <div className="submitButton">
-              <input type="submit" value="Register" disabled={!isValid} />
-            </div>
+            <Link to="/welcome">
+              <div className="submitButton">
+                <input type="submit" value="Register" disabled={!isValid} />
+              </div>
+            </Link>
           </form>
         </div>
       </div>

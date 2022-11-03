@@ -26,26 +26,26 @@ import Leaderboard from "./pages/Leaderboard";
 const teamPicker = require("./functions/teamPicker");
 
 //dummyData
-const teams = [
-  {
-    name: "Qatar",
-    availible: true,
-  },
-  {
-    name: "Ecuador",
-    availible: true,
-  },
-  {
-    name: "Senegal",
-    availible: false,
-  },
-  {
-    name: "Netherlands",
-    availible: true,
-  },
-];
+// const teams = [
+//   {
+//     name: "Qatar",
+//     availible: true,
+//   },
+//   {
+//     name: "Ecuador",
+//     availible: true,
+//   },
+//   {
+//     name: "Senegal",
+//     availible: false,
+//   },
+//   {
+//     name: "Netherlands",
+//     availible: true,
+//   },
+// ];
 
-console.log(teamPicker(teams));
+// console.log(teamPicker(teams));
 
 function App() {
   return (
