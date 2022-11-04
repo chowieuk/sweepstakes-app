@@ -328,13 +328,13 @@ func AllocateTeamSocial(user token.User) (entity.TeamData, error) {
 	}
 
 	if err != nil {
-		log.Printf("[DEBUG] failed when attempting to update team %s (Object ID: %s) with user %s id %s ", team.Name, team.ID, user.Name, user.ID)
+		log.Printf("[DEBUG] failed when attempting to update team %s (Object ID: %s) with user %s id %s ", team.Name, team.Team_id, user.Name, user.ID)
 		return entity.TeamData{}, err
 	}
 
 	user.SetStrAttr("team_name", team.Name)
 	user.SetStrAttr("team_flag", team.Flag)
-	log.Printf("[INFO] successfully allocated %s (id %s) to %s (id %s)\n", team.Name, team.ID, user.Name, user.ID)
+	log.Printf("[INFO] successfully allocated %s (id %s) to %s (id %s)\n", team.Name, team.Team_id, user.Name, user.ID)
 	// log.Printf("[INFO] available teams left: %s)\n",)
 	return team, nil
 }
@@ -348,15 +348,15 @@ func UpdateSocialUserWithTeam(user token.User, team entity.TeamData) error {
 		Key: "$set",
 		Value: bson.D{{
 			Key:   "team_id",
-			Value: team.ID}}}})
+			Value: team.Team_id}}}})
 	defer cancel()
 	if !(result.ModifiedCount > 0) {
 		log.Printf("[DEBUG] no records were modified")
-		log.Printf("[DEBUG] no record added when attempting to update user %s (ID: %s) with team %s (ID: %s) ", user.Email, user.ID, team.Name, team.ID)
+		log.Printf("[DEBUG] no record added when attempting to update user %s (ID: %s) with team %s (ID: %s) ", user.Email, user.ID, team.Name, team.Team_id)
 	}
 
 	if err != nil {
-		log.Printf("[DEBUG] failed when attempting to update user %s (ID: %s) with team %s (ID: %s) ", user.Email, user.ID, team.Name, team.ID)
+		log.Printf("[DEBUG] failed when attempting to update user %s (ID: %s) with team %s (ID: %s) ", user.Email, user.ID, team.Name, team.Team_id)
 		return err
 	}
 	return nil
