@@ -38,6 +38,7 @@
   color: white;
   display: flex;
   justify-content: center;
+  text-align: center;
 }
 .welcome-wrapper .button-container {
   padding-top: 10vh;
@@ -63,4 +64,4 @@
   text-decoration: none;
 }
 
-/*# sourceMappingURL=welcome.css.map */
+/*# sourceMappingURL=Welcome.css.map */
