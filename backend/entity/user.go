@@ -14,7 +14,7 @@ type User struct {
 	Full_Name  string              `json:"full_name"`
 	Email      string              `json:"email"`
 	Password   *string             `json:"password,omitempty"`
-	ID         string              `json:"id"`
+	ID         string              `json:"id,omitempty"`
 	Team_id    string              `json:"team_id"`
 }
 

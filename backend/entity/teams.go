@@ -6,7 +6,6 @@ import (
 
 // TeamResponse is used to construct requests and parse responses which include an array of teams
 type TeamResponse struct {
-	Error  string     `json:"error"`
 	Status string     `json:"status"`
 	Teams  []TeamData `json:"data"`
 }
