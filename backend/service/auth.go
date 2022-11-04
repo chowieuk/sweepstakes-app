@@ -134,7 +134,7 @@ func checkMongo(collection *mongo.Collection, user, password string) (ok bool, e
 		return false, err
 	}
 
-	passwordIsValid := CheckPasswordHash(password, foundUser.Password)
+	passwordIsValid := CheckPasswordHash(password, *foundUser.Password)
 	defer cancel()
 	if !passwordIsValid {
 		log.Printf("[DEBUG] password does not match hash found in collection %s\n", collection.Name())

@@ -117,7 +117,7 @@ func main() {
 			return user
 		})))
 		r.Get("/private_data", protectedDataHandler) // protected api
-		//r.Get("/api/v1/team/{id}", singleTeamResponseHandler)
+		r.Get("/api/v1/team/{id}", singleTeamResponseHandler)
 		r.Get("/api/v1/team", allTeamsResponseHandler)
 	})
 
@@ -203,12 +203,13 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("[INFO] populating client entity and allocating team")
 
-	password := service.HashPassword(user.Password)
-	user.Password = password
-
-	user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-	user.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-	user.ObjectID = primitive.NewObjectID()
+	password := service.HashPassword(*user.Password)
+	user.Password = &password
+	now, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	user.Created_at = &now
+	user.Updated_at = &now
+	newId := primitive.NewObjectID()
+	user.ObjectID = &newId
 	user.ID = "mongo_" + token.HashID(sha1.New(), user.Email)
 
 	team, err := randomUnassignedTeam(ctx)
@@ -450,44 +451,52 @@ func UpdateSocialUserWithTeam(user token.User, team entity.TeamData) error {
 
 //     Http Method : GET http://chowie.uk/api/v1/team/{id}
 
-// func singleTeamResponseHandler(w http.ResponseWriter, r *http.Request) {
+func singleTeamResponseHandler(w http.ResponseWriter, r *http.Request) {
 
-// 	team_id := chi.URLParam(r, "id")
+	team_id := chi.URLParam(r, "id")
 
-// 	pipeline := mongo.Pipeline{bson.D{
-// 		{"$match", bson.D{{"id", team_id}}},
-// 		{"$lookup",
-// 			bson.D{
-// 				{"from", "users"},
-// 				{"localField", "user_id"},
-// 				{"foreignField", "id"},
-// 				{"as", "user"},
-// 			},
-// 		},
-// 	}}
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.D{{Key: "id", Value: team_id}}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "user_id"},
+			{Key: "foreignField", Value: "id"},
+			{Key: "pipeline",
+				Value: bson.A{
+					bson.D{
+						{Key: "$project",
+							Value: bson.D{
+								{Key: "password", Value: 0},
+								{Key: "_id", Value: 0},
+								{Key: "id", Value: 0},
+								{Key: "created_at", Value: 0},
+								{Key: "updated_at", Value: 0},
+							},
+						},
+					},
+				},
+			},
+			{Key: "as", Value: "user"},
+		}}},
+	}
 
-// 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	cursor, err := teamCollection.Aggregate(ctx, pipeline)
+	defer cancel()
+	if err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch team")
+	}
 
-// 	cursor, err := teamCollection.Aggregate(ctx, pipeline)
-// 	defer cancel()
-// 	for cursor.Next(ctx) {
-// 		if err := cursor.Decode(&team); err != nil {
-// 			log.Printf("[DEBUG] error during decode: %v", err)
-// 			return entity.TeamData{}, err
-// 		}
-// 	}
+	var res entity.TeamResponse
 
-// 	var res entity.TeamResponse
+	if err = cursor.All(ctx, &res.Teams); err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to parse team")
+	}
+	defer cancel()
+	res.Status = "success"
 
-// 	if err := teamCollection.FindOne(ctx, bson.D{{Key: "id", Value: team_id}}).Decode(&res); err != nil {
-// 		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch team")
-// 	}
-// 	defer cancel()
-
-// 	res.Status = "success"
-
-// 	rest.RenderJSON(w, res)
-// }
+	rest.RenderJSON(w, res)
+}
 
 // A request on Team endpoint returns all information about all Teams
 
@@ -502,6 +511,21 @@ func allTeamsResponseHandler(w http.ResponseWriter, r *http.Request) {
 				{Key: "from", Value: "users"},
 				{Key: "localField", Value: "user_id"},
 				{Key: "foreignField", Value: "id"},
+				{Key: "pipeline",
+					Value: bson.A{
+						bson.D{
+							{Key: "$project",
+								Value: bson.D{
+									{Key: "password", Value: 0},
+									{Key: "_id", Value: 0},
+									{Key: "id", Value: 0},
+									{Key: "created_at", Value: 0},
+									{Key: "updated_at", Value: 0},
+								},
+							},
+						},
+					},
+				},
 				{Key: "as", Value: "user"},
 			},
 		},
