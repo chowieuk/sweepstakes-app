@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Navigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import "./Registration.scss";
+import "./Registration.css";
 
 function Registration() {
   const [redirect, setRedirect] = useState(false);

@@ -4,46 +4,44 @@ import Spinner from "react-bootstrap/Spinner";
 import Container from "react-bootstrap/Container";
 import "./Matches.css";
 
-const getMatchData = async (token) => {
+const getMatchData = async () => {
   // console.log(`hello ${token}`)
 
   try {
-    return fetch("/match", {
+    return fetch("http://localhost:8080/api/v1/match", {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept",
+        // "Access-Control-Allow-Origin": "*",
+        // "Access-Control-Allow-Headers":
+        //   "Origin, X-Requested-With, Content-Type, Accept",
       },
     }).then((res) => res.json());
   } catch (err) {}
 };
 
-const getToken = async () => {
-  return fetch("/user/login", {
-    method: "POST",
-    body: JSON.stringify({
-      email: "patrickreynoldscoding@gmail.com",
-      password: "password",
-    }),
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers":
-        "Origin, X-Requested-With, Content-Type, Accept",
-    },
-  }).then((res) => res.json());
-};
+// const getToken = async () => {
+//   return fetch("/user/login", {
+//     method: "POST",
+//     body: JSON.stringify({
+//       email: "patrickreynoldscoding@gmail.com",
+//       password: "password",
+//     }),
+//     headers: {
+//       "Content-Type": "application/json",
+//       "Access-Control-Allow-Origin": "*",
+//       "Access-Control-Allow-Headers":
+//         "Origin, X-Requested-With, Content-Type, Accept",
+//     },
+//   }).then((res) => res.json());
+// };
 
 export default function Matches() {
   const [matchData, setMatchData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getToken()
-      .then((res) => getMatchData(res.data.token))
+    getMatchData()
       .then((res) => setMatchData(JSON.parse(JSON.stringify(res.data))))
       .then(() => setLoading(false))
       .then(() => console.log(matchData))
