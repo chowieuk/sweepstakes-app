@@ -6,7 +6,6 @@ import (
 
 // TeamResponse is used to construct requests and parse responses which include an array of teams
 type TeamResponse struct {
-	Error  string     `json:"error"`
 	Status string     `json:"status"`
 	Teams  []TeamData `json:"data"`
 }
@@ -22,7 +21,7 @@ type TeamData struct {
 	FifaCode string             `json:"fifa_code" bson:"fifa_code"`
 	ISO2     string             `json:"iso2" bson:"iso2"`
 	Group    string             `json:"groups" bson:"groups"`
-	ID       string             `json:"id" bson:"id"`
-	User_id  string             `json:"user_id" bson:"user_id"`
-	User     []interface{}      `json:"user" bson:"user"`
+	Team_id  string             `json:"id" bson:"id"`
+	User_id  string             `json:"user_id,omitempty" bson:"user_id"`
+	User     []User             `json:"user,omitempty" bson:"user,omitempty"`
 }
