@@ -73,13 +73,13 @@ func main() {
 		r.Use(m.UpdateUser(middleware.UserUpdFunc(func(user token.User) token.User {
 			return user
 		})))
-		r.Get("/private_data", protectedDataHandler)                // protected api
-		r.Get("/api/v1/team", allTeamsResponseHandler)              // data for all teams
-		r.Get("/api/v1/team/{id}", singleTeamResponseHandler)       // data for a specific team by team id
-		r.Get("/api/v1/match", allMatchesResponseHandler)           // data for all matches
-		r.Get("/api/v1/match/{id}", singleMatchResponseHandler)     // data for a single match by match id
-		r.Get("/api/v1/match/day/{day}", byDayMatchResponseHandler) // data for all matches on a given day
-		// r.Post("/api/v1/bydate", byDateMatchResponseHandler) // data for all matches on a give date in the form {"date":"12/2/2022"}
+		r.Get("/private_data", protectedDataHandler)                            // protected api
+		r.Get("/api/v1/team", allTeamsResponseHandler)                          // data for all teams
+		r.Get("/api/v1/team/{id}", singleTeamResponseHandler)                   // data for a specific team by team id
+		r.Get("/api/v1/match", allMatchesResponseHandler)                       // data for all matches
+		r.Get("/api/v1/match/{id}", singleMatchResponseHandler)                 // data for a single match by match id
+		r.Get("/api/v1/match/day/{day}", byDayMatchResponseHandler)             // data for all matches on a given day
+		r.Post("/api/v1/match/date", byDateMatchResponseHandler)                // data for all matches on a given date. Post request should include a body in the form {"date":"mm/dd/yyyy"}
 		r.Get("/api/v1/standings", allStandingsResponseHandler)                 // data for all standings
 		r.Get("/api/v1/standings/group/{group}", groupStandingsResponseHandler) // data for standings of a specific group
 		r.Get("/api/v1/standings/team/{id}", teamStandingsResponseHandler)      // data for standings of a specific team
@@ -252,11 +252,6 @@ func protectedDataHandler(w http.ResponseWriter, r *http.Request) {
 	rest.RenderJSON(w, res)
 }
 
-// A request on Team endpoint returns all information on a Team by id
-
-//     Http Method : GET http://chowie.uk/api/v1/team/{id}
-//	   Http Method : GET http://localhost:8080/api/v1/team/{id}
-
 // singleTeamResponseHandler responds with JSON for a single team by team_id, with a lookup for the associated user
 func singleTeamResponseHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -304,14 +299,11 @@ func singleTeamResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer cancel()
-	res.Status = "success"
-	rest.RenderJSON(w, res)
+	if res.Teams != nil {
+		res.Status = "success"
+		rest.RenderJSON(w, res)
+	}
 }
-
-// A request on Team endpoint returns all information about all Teams
-
-//     Http Method : GET http://chowie.uk/api/v1/team
-//     Http Method : GET http://localhost:8080/api/v1/team
 
 // allTeamsResponseHandler responds with JSON for all teams, with a lookup for the user associated with that team
 func allTeamsResponseHandler(w http.ResponseWriter, r *http.Request) {
@@ -348,10 +340,13 @@ func allTeamsResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer cancel()
-	res.Status = "success"
-	rest.RenderJSON(w, res)
+	if res.Teams != nil {
+		res.Status = "success"
+		rest.RenderJSON(w, res)
+	}
 }
 
+// singleMatchResponseHandler responds with JSON for a single team by match_id, with a lookup for the associated user
 func singleMatchResponseHandler(w http.ResponseWriter, r *http.Request) {
 
 	match_id := chi.URLParam(r, "id")
@@ -400,10 +395,13 @@ func singleMatchResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer cancel()
-	res.Status = "success"
-	rest.RenderJSON(w, res)
+	if res.Matches != nil {
+		res.Status = "success"
+		rest.RenderJSON(w, res)
+	}
 }
 
+// byDayMatchResponseHandler responds with JSON for a all matchs on a specific matchday, with a lookup for the associated user
 func byDayMatchResponseHandler(w http.ResponseWriter, r *http.Request) {
 
 	matchday := chi.URLParam(r, "day")
@@ -452,13 +450,93 @@ func byDayMatchResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer cancel()
-	res.Status = "success"
-	rest.RenderJSON(w, res)
+	if res.Matches != nil {
+		res.Status = "success"
+		rest.RenderJSON(w, res)
+	}
 }
 
-// A request on Match endpoint returns all information about all Matches
-//     Http Method : GET http://chowie.uk/api/v1/match
-//     Http Method : GET http://localhost:8080/api/v1/match
+// byDateMatchResponseHandler responds with JSON of the matches occuring on the date specified the POST request body, with a lookup for the associated user. Date should be in the form {"date":"mm/dd/yyyy"}.
+func byDateMatchResponseHandler(w http.ResponseWriter, r *http.Request) {
+
+	request := struct {
+		Date string `json:"date"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&request)
+
+	if err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed decoding date")
+		return
+	}
+
+	pipeline := mongo.Pipeline{
+		{{Key: "$addFields", Value: bson.D{
+			{Key: "uk_date", Value: bson.D{
+				{Key: "$dateToString", Value: bson.D{
+					{Key: "format", Value: "%m/%d/%Y"},
+					{Key: "timezone", Value: "Europe/London"},
+					{Key: "date", Value: bson.D{
+						{Key: "$dateFromString", Value: bson.D{
+							{Key: "dateString", Value: "$local_date"},
+							{Key: "format", Value: "%m/%d/%Y %H:%M"},
+							{Key: "timezone", Value: "Asia/Qatar"},
+							{Key: "onError", Value: "cannot parse date from API"},
+							{Key: "onNull", Value: "null value in data from API"},
+						}}}}}}}}}}},
+		{{Key: "$match", Value: bson.D{{Key: "uk_date", Value: request.Date}}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "away_team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "away_user"},
+		}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "home_team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "home_user"},
+		}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "home_user.password", Value: 0},
+			{Key: "home_user._id", Value: 0},
+			{Key: "home_user.id", Value: 0},
+			{Key: "home_user.team_id", Value: 0},
+			{Key: "home_user.created_at", Value: 0},
+			{Key: "home_user.updated_at", Value: 0},
+			{Key: "away_user.password", Value: 0},
+			{Key: "away_user._id", Value: 0},
+			{Key: "away_user.id", Value: 0},
+			{Key: "away_user.team_id", Value: 0},
+			{Key: "away_user.created_at", Value: 0},
+			{Key: "away_user.updated_at", Value: 0},
+		}}}}
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	cursor, err := matchesCollection.Aggregate(ctx, pipeline)
+	defer cancel()
+	if err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch teams")
+		return
+	}
+
+	if cursor.RemainingBatchLength() < 1 {
+		log.Printf(request.Date)
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch matches. maybe check your date")
+	}
+
+	var res entity.MatchResponse
+
+	if err = cursor.All(ctx, &res.Matches); err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to parse teams")
+		return
+	}
+	defer cancel()
+	if res.Matches != nil {
+		res.Status = "success"
+		rest.RenderJSON(w, res)
+	}
+}
 
 // allMatchesResponseHandler responds with JSON of all matches in the matches collection, with a lookup for the users associated with the home & away teams
 func allMatchesResponseHandler(w http.ResponseWriter, r *http.Request) {
@@ -506,16 +584,13 @@ func allMatchesResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer cancel()
-	res.Status = "success"
-	rest.RenderJSON(w, res)
+	if res.Matches != nil {
+		res.Status = "success"
+		rest.RenderJSON(w, res)
+	}
 }
 
-// A request on Standings endpoint returns Standings information for all teams
-
-//     Http Method : GET http://chowie.uk/api/v1/standings
-//     Http Method : GET http://localhost:8080/api/v1/standings
-
-// allStandingsResponseHandler responds with JSON of all standings in the standings collection, with a lookup to include the user associated with each team. The results of this lookup have been mapped onto an an additionl field combining the team objects with user objects. This additional field replaces the original teams field
+// allStandingsResponseHandler responds with JSON of all standings in the standings collection, with a lookup to include the user associated with each team. The results of this lookup have been mapped onto an an additionl field combining objects in the teams array with user objects. This additional field replaces the original teams field
 // seems like a workaround, but is necessary if we want to conform to the schema of the source API (https://jira.mongodb.org/browse/SERVER-42306?focusedCommentId=2348528&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-2348528)
 func allStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
 	pipeline := mongo.Pipeline{
@@ -567,10 +642,13 @@ func allStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer cancel()
-	res.Status = "success"
-	rest.RenderJSON(w, res)
+	if res.Standings != nil {
+		res.Status = "success"
+		rest.RenderJSON(w, res)
+	}
 }
 
+// allStandingsResponseHandler responds with JSON of standings by group, with a lookup to include the user associated with each team. The results of this lookup have been mapped onto an an additionl field combining objects in the teams array with user objects. This additional field replaces the original teams field
 func groupStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
 
 	group := chi.URLParam(r, "group")
@@ -618,6 +696,11 @@ func groupStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if cursor.RemainingBatchLength() < 1 {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch teams, check your group")
+		return
+	}
+
 	var res entity.StandingsResponse
 
 	if err = cursor.All(ctx, &res.Standings); err != nil {
@@ -625,10 +708,13 @@ func groupStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer cancel()
-	res.Status = "success"
-	rest.RenderJSON(w, res)
+	if res.Standings != nil {
+		res.Status = "success"
+		rest.RenderJSON(w, res)
+	}
 }
 
+// allStandingsResponseHandler responds with JSON of standings by team_id, with a lookup to include the user associated with each team. The results of this lookup have been mapped onto an an additionl field combining objects in the teams array with user objects. This additional field replaces the original teams field
 func teamStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
 
 	team_id := chi.URLParam(r, "id")
@@ -683,6 +769,8 @@ func teamStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer cancel()
-	res.Status = "success"
-	rest.RenderJSON(w, res)
+	if res.Standings != nil {
+		res.Status = "success"
+		rest.RenderJSON(w, res)
+	}
 }
