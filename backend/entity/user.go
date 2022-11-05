@@ -15,7 +15,7 @@ type User struct {
 	Email      string              `json:"email"`
 	Password   *string             `json:"password,omitempty"`
 	ID         string              `json:"id,omitempty"`
-	Team_id    string              `json:"team_id"`
+	Team_id    string              `json:"team_id,omitempty"`
 }
 
 // SocialUser is a reduced model for new registrants that will be inserted into the DB
