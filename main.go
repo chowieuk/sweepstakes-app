@@ -73,12 +73,12 @@ func main() {
 		r.Use(m.UpdateUser(middleware.UserUpdFunc(func(user token.User) token.User {
 			return user
 		})))
-		r.Get("/private_data", protectedDataHandler)          // protected api
-		r.Get("/api/v1/team", allTeamsResponseHandler)        // data for all teams
-		r.Get("/api/v1/team/{id}", singleTeamResponseHandler) // data for a specific team by team id
-		r.Get("/api/v1/match", allMatchesResponseHandler)     // data for all matches
-		// r.Get("/api/v1/match/{id}", singleMatchResponseHandler) // data for a single match by match id
-		// r.Get("/api/v1/bymatch/{day}", byDayMatchResponseHandler) // data for all matches on a given day
+		r.Get("/private_data", protectedDataHandler)                // protected api
+		r.Get("/api/v1/team", allTeamsResponseHandler)              // data for all teams
+		r.Get("/api/v1/team/{id}", singleTeamResponseHandler)       // data for a specific team by team id
+		r.Get("/api/v1/match", allMatchesResponseHandler)           // data for all matches
+		r.Get("/api/v1/match/{id}", singleMatchResponseHandler)     // data for a single match by match id
+		r.Get("/api/v1/match/day/{day}", byDayMatchResponseHandler) // data for all matches on a given day
 		// r.Post("/api/v1/bydate", byDateMatchResponseHandler) // data for all matches on a give date in the form {"date":"12/2/2022"}
 		r.Get("/api/v1/standings", allStandingsResponseHandler)                 // data for all standings
 		r.Get("/api/v1/standings/group/{group}", groupStandingsResponseHandler) // data for standings of a specific group
@@ -344,6 +344,110 @@ func allTeamsResponseHandler(w http.ResponseWriter, r *http.Request) {
 	var res entity.TeamResponse
 
 	if err = cursor.All(ctx, &res.Teams); err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to parse teams")
+		return
+	}
+	defer cancel()
+	res.Status = "success"
+	rest.RenderJSON(w, res)
+}
+
+func singleMatchResponseHandler(w http.ResponseWriter, r *http.Request) {
+
+	match_id := chi.URLParam(r, "id")
+
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.D{{Key: "id", Value: match_id}}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "away_team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "away_user"},
+		}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "home_team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "home_user"},
+		}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "home_user.password", Value: 0},
+			{Key: "home_user._id", Value: 0},
+			{Key: "home_user.id", Value: 0},
+			{Key: "home_user.team_id", Value: 0},
+			{Key: "home_user.created_at", Value: 0},
+			{Key: "home_user.updated_at", Value: 0},
+			{Key: "away_user.password", Value: 0},
+			{Key: "away_user._id", Value: 0},
+			{Key: "away_user.id", Value: 0},
+			{Key: "away_user.team_id", Value: 0},
+			{Key: "away_user.created_at", Value: 0},
+			{Key: "away_user.updated_at", Value: 0},
+		}}}}
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	cursor, err := matchesCollection.Aggregate(ctx, pipeline)
+	defer cancel()
+	if err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch teams")
+		return
+	}
+
+	var res entity.MatchResponse
+
+	if err = cursor.All(ctx, &res.Matches); err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to parse teams")
+		return
+	}
+	defer cancel()
+	res.Status = "success"
+	rest.RenderJSON(w, res)
+}
+
+func byDayMatchResponseHandler(w http.ResponseWriter, r *http.Request) {
+
+	matchday := chi.URLParam(r, "day")
+
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.D{{Key: "matchday", Value: matchday}}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "away_team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "away_user"},
+		}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "home_team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "home_user"},
+		}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "home_user.password", Value: 0},
+			{Key: "home_user._id", Value: 0},
+			{Key: "home_user.id", Value: 0},
+			{Key: "home_user.team_id", Value: 0},
+			{Key: "home_user.created_at", Value: 0},
+			{Key: "home_user.updated_at", Value: 0},
+			{Key: "away_user.password", Value: 0},
+			{Key: "away_user._id", Value: 0},
+			{Key: "away_user.id", Value: 0},
+			{Key: "away_user.team_id", Value: 0},
+			{Key: "away_user.created_at", Value: 0},
+			{Key: "away_user.updated_at", Value: 0},
+		}}}}
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	cursor, err := matchesCollection.Aggregate(ctx, pipeline)
+	defer cancel()
+	if err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch teams")
+		return
+	}
+
+	var res entity.MatchResponse
+
+	if err = cursor.All(ctx, &res.Matches); err != nil {
 		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to parse teams")
 		return
 	}
