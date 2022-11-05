@@ -697,7 +697,7 @@ func groupStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if cursor.RemainingBatchLength() < 1 {
-		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch teams, check your group")
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch standings, check your group")
 		return
 	}
 
