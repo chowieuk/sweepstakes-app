@@ -80,8 +80,8 @@ func main() {
 		// r.Get("/api/v1/match/{id}", singleMatchResponseHandler) // data for a single match by match id
 		// r.Get("/api/v1/bymatch/{day}", byDayMatchResponseHandler) // data for all matches on a given day
 		// r.Post("/api/v1/bydate", byDateMatchResponseHandler) // data for all matches on a give date in the form {"date":"12/2/2022"}
-		r.Get("/api/v1/standings", allStandingsResponseHandler) // data for all standings
-		// r.Get("/api/v1/standings/group/{group}", groupStandingsResponseHandler) // data for standings of a specific group
+		r.Get("/api/v1/standings", allStandingsResponseHandler)                 // data for all standings
+		r.Get("/api/v1/standings/group/{group}", groupStandingsResponseHandler) // data for standings of a specific group
 		// r.Get("/api/v1/standings/team/{id}", teamStandingsResponseHandler) // data for standings of a specific team
 	})
 
@@ -268,24 +268,17 @@ func singleTeamResponseHandler(w http.ResponseWriter, r *http.Request) {
 			{Key: "from", Value: "users"},
 			{Key: "localField", Value: "user_id"},
 			{Key: "foreignField", Value: "id"},
-			{Key: "pipeline",
-				Value: bson.A{
-					bson.D{
-						{Key: "$project",
-							Value: bson.D{
-								{Key: "password", Value: 0},
-								{Key: "_id", Value: 0},
-								{Key: "id", Value: 0},
-								{Key: "created_at", Value: 0},
-								{Key: "updated_at", Value: 0},
-							},
-						},
-					},
-				},
-			},
 			{Key: "as", Value: "user"},
 		}}},
-	}
+		{{Key: "$project", Value: bson.D{
+			{Key: "user_id", Value: 0},
+			{Key: "user.password", Value: 0},
+			{Key: "user._id", Value: 0},
+			{Key: "user.id", Value: 0},
+			{Key: "user.team_id", Value: 0},
+			{Key: "user.created_at", Value: 0},
+			{Key: "user.updated_at", Value: 0},
+		}}}}
 
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
@@ -323,31 +316,22 @@ func singleTeamResponseHandler(w http.ResponseWriter, r *http.Request) {
 // allTeamsResponseHandler responds with JSON for all teams, with a lookup for the user associated with that team
 func allTeamsResponseHandler(w http.ResponseWriter, r *http.Request) {
 
-	pipeline := mongo.Pipeline{bson.D{
-		{Key: "$lookup",
-			Value: bson.D{
-				{Key: "from", Value: "users"},
-				{Key: "localField", Value: "user_id"},
-				{Key: "foreignField", Value: "id"},
-				{Key: "pipeline",
-					Value: bson.A{
-						bson.D{
-							{Key: "$project",
-								Value: bson.D{
-									{Key: "password", Value: 0},
-									{Key: "_id", Value: 0},
-									{Key: "id", Value: 0},
-									{Key: "created_at", Value: 0},
-									{Key: "updated_at", Value: 0},
-								},
-							},
-						},
-					},
-				},
-				{Key: "as", Value: "user"},
-			},
-		},
-	}}
+	pipeline := mongo.Pipeline{
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "user_id"},
+			{Key: "foreignField", Value: "id"},
+			{Key: "as", Value: "user"},
+		}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "user_id", Value: 0},
+			{Key: "user.password", Value: 0},
+			{Key: "user._id", Value: 0},
+			{Key: "user.id", Value: 0},
+			{Key: "user.team_id", Value: 0},
+			{Key: "user.created_at", Value: 0},
+			{Key: "user.updated_at", Value: 0},
+		}}}}
 
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	cursor, err := teamCollection.Aggregate(ctx, pipeline)
@@ -375,56 +359,33 @@ func allTeamsResponseHandler(w http.ResponseWriter, r *http.Request) {
 // allMatchesResponseHandler responds with JSON of all matches in the matches collection, with a lookup for the users associated with the home & away teams
 func allMatchesResponseHandler(w http.ResponseWriter, r *http.Request) {
 
-	pipeline := mongo.Pipeline{bson.D{
-		{Key: "$lookup",
-			Value: bson.D{
-				{Key: "from", Value: "users"},
-				{Key: "localField", Value: "away_team_id"},
-				{Key: "foreignField", Value: "team_id"},
-				{Key: "pipeline",
-					Value: bson.A{
-						bson.D{
-							{Key: "$project",
-								Value: bson.D{
-									{Key: "password", Value: 0},
-									{Key: "_id", Value: 0},
-									{Key: "id", Value: 0},
-									{Key: "created_at", Value: 0},
-									{Key: "updated_at", Value: 0},
-								},
-							},
-						},
-					},
-				},
-				{Key: "as", Value: "away_user"},
-			},
-		},
-	},
-		bson.D{
-			{Key: "$lookup",
-				Value: bson.D{
-					{Key: "from", Value: "users"},
-					{Key: "localField", Value: "home_team_id"},
-					{Key: "foreignField", Value: "team_id"},
-					{Key: "pipeline",
-						Value: bson.A{
-							bson.D{
-								{Key: "$project",
-									Value: bson.D{
-										{Key: "password", Value: 0},
-										{Key: "_id", Value: 0},
-										{Key: "id", Value: 0},
-										{Key: "created_at", Value: 0},
-										{Key: "updated_at", Value: 0},
-									},
-								},
-							},
-						},
-					},
-					{Key: "as", Value: "home_user"},
-				},
-			},
-		}}
+	pipeline := mongo.Pipeline{
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "away_team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "away_user"},
+		}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "home_team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "home_user"},
+		}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "home_user.password", Value: 0},
+			{Key: "home_user._id", Value: 0},
+			{Key: "home_user.id", Value: 0},
+			{Key: "home_user.team_id", Value: 0},
+			{Key: "home_user.created_at", Value: 0},
+			{Key: "home_user.updated_at", Value: 0},
+			{Key: "away_user.password", Value: 0},
+			{Key: "away_user._id", Value: 0},
+			{Key: "away_user.id", Value: 0},
+			{Key: "away_user.team_id", Value: 0},
+			{Key: "away_user.created_at", Value: 0},
+			{Key: "away_user.updated_at", Value: 0},
+		}}}}
 
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	cursor, err := matchesCollection.Aggregate(ctx, pipeline)
@@ -453,75 +414,97 @@ func allMatchesResponseHandler(w http.ResponseWriter, r *http.Request) {
 // allStandingsResponseHandler responds with JSON of all standings in the standings collection, with a lookup to include the user associated with each team. The results of this lookup have been mapped onto an an additionl field combining the team objects with user objects. This additional field replaces the original teams field
 // seems like a workaround, but is necessary if we want to conform to the schema of the source API (https://jira.mongodb.org/browse/SERVER-42306?focusedCommentId=2348528&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-2348528)
 func allStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
-	pipeline := mongo.Pipeline{bson.D{
-		{Key: "$lookup",
-			Value: bson.D{
-				{Key: "from", Value: "users"},
-				{Key: "localField", Value: "teams.team_id"},
-				{Key: "foreignField", Value: "team_id"},
-				{Key: "as", Value: "users"},
-			},
-		},
-	},
-		bson.D{
-			{Key: "$addFields",
-				Value: bson.D{
-					{Key: "teams",
-						Value: bson.D{
-							{Key: "$map",
-								Value: bson.D{
-									{Key: "input", Value: "$teams"},
-									{Key: "as", Value: "teams"},
-									{Key: "in",
-										Value: bson.D{
-											{Key: "$mergeObjects",
-												Value: bson.A{
-													"$$teams",
-													bson.D{
-														{Key: "user",
-															Value: bson.D{
-																{Key: "$filter",
-																	Value: bson.D{
-																		{Key: "input", Value: "$users"},
-																		{Key: "cond",
-																			Value: bson.D{
-																				{Key: "$eq",
-																					Value: bson.A{
-																						"$$teams.team_id",
-																						"$$this.team_id",
-																					},
-																				},
-																			},
-																		},
-																	},
-																},
-															},
-														},
-													},
-												},
-											},
+	pipeline := mongo.Pipeline{
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "teams.team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "users"},
+		}}},
+		{{Key: "$addFields", Value: bson.D{
+			{Key: "teams", Value: bson.D{
+				{Key: "$map", Value: bson.D{
+					{Key: "input", Value: "$teams"},
+					{Key: "as", Value: "teams"},
+					{Key: "in", Value: bson.D{
+						{Key: "$mergeObjects", Value: bson.A{"$$teams", bson.D{
+							{Key: "user", Value: bson.D{
+								{Key: "$filter", Value: bson.D{
+									{Key: "input", Value: "$users"},
+									{Key: "cond", Value: bson.D{
+										{Key: "$eq", Value: bson.A{
+											"$$teams.team_id",
+											"$$this.team_id",
 										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		bson.D{
-			{Key: "$project",
-				Value: bson.D{
-					{Key: "users", Value: 0},
-					{Key: "teams.user.team_id", Value: 0},
-					{Key: "teams.user.password", Value: 0},
-					{Key: "teams.user._id", Value: 0},
-					{Key: "teams.user.id", Value: 0},
-					{Key: "teams.user.created_at", Value: 0},
-					{Key: "teams.user.updated_at", Value: 0},
-				},
-			},
-		}}
+										}}}}}}}}}}}}}}}}}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "users", Value: 0},
+			{Key: "teams.user_id", Value: 0},
+			{Key: "teams.user.team_id", Value: 0},
+			{Key: "teams.user.password", Value: 0},
+			{Key: "teams.user._id", Value: 0},
+			{Key: "teams.user.id", Value: 0},
+			{Key: "teams.user.created_at", Value: 0},
+			{Key: "teams.user.updated_at", Value: 0},
+		}}}}
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	cursor, err := standingsCollection.Aggregate(ctx, pipeline)
+	defer cancel()
+	if err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch teams")
+		return
+	}
+
+	var res entity.StandingsResponse
+
+	if err = cursor.All(ctx, &res.Standings); err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to parse teams")
+		return
+	}
+	defer cancel()
+	res.Status = "success"
+	rest.RenderJSON(w, res)
+}
+
+func groupStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
+
+	group := chi.URLParam(r, "group")
+
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.D{{Key: "group", Value: group}}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "teams.team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "users"},
+		}}},
+		{{Key: "$addFields", Value: bson.D{
+			{Key: "teams", Value: bson.D{
+				{Key: "$map", Value: bson.D{
+					{Key: "input", Value: "$teams"},
+					{Key: "as", Value: "teams"},
+					{Key: "in", Value: bson.D{
+						{Key: "$mergeObjects", Value: bson.A{"$$teams", bson.D{
+							{Key: "user", Value: bson.D{
+								{Key: "$filter", Value: bson.D{
+									{Key: "input", Value: "$users"},
+									{Key: "cond", Value: bson.D{
+										{Key: "$eq", Value: bson.A{
+											"$$teams.team_id",
+											"$$this.team_id",
+										},
+										}}}}}}}}}}}}}}}}}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "users", Value: 0},
+			{Key: "teams.user_id", Value: 0},
+			{Key: "teams.user.team_id", Value: 0},
+			{Key: "teams.user.password", Value: 0},
+			{Key: "teams.user._id", Value: 0},
+			{Key: "teams.user.id", Value: 0},
+			{Key: "teams.user.created_at", Value: 0},
+			{Key: "teams.user.updated_at", Value: 0},
+		}}}}
 
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	cursor, err := standingsCollection.Aggregate(ctx, pipeline)
