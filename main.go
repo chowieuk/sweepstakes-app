@@ -82,7 +82,7 @@ func main() {
 		// r.Post("/api/v1/bydate", byDateMatchResponseHandler) // data for all matches on a give date in the form {"date":"12/2/2022"}
 		r.Get("/api/v1/standings", allStandingsResponseHandler)                 // data for all standings
 		r.Get("/api/v1/standings/group/{group}", groupStandingsResponseHandler) // data for standings of a specific group
-		// r.Get("/api/v1/standings/team/{id}", teamStandingsResponseHandler) // data for standings of a specific team
+		r.Get("/api/v1/standings/team/{id}", teamStandingsResponseHandler)      // data for standings of a specific team
 	})
 
 	// declare custom 404
@@ -473,6 +473,64 @@ func groupStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
 
 	pipeline := mongo.Pipeline{
 		{{Key: "$match", Value: bson.D{{Key: "group", Value: group}}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "users"},
+			{Key: "localField", Value: "teams.team_id"},
+			{Key: "foreignField", Value: "team_id"},
+			{Key: "as", Value: "users"},
+		}}},
+		{{Key: "$addFields", Value: bson.D{
+			{Key: "teams", Value: bson.D{
+				{Key: "$map", Value: bson.D{
+					{Key: "input", Value: "$teams"},
+					{Key: "as", Value: "teams"},
+					{Key: "in", Value: bson.D{
+						{Key: "$mergeObjects", Value: bson.A{"$$teams", bson.D{
+							{Key: "user", Value: bson.D{
+								{Key: "$filter", Value: bson.D{
+									{Key: "input", Value: "$users"},
+									{Key: "cond", Value: bson.D{
+										{Key: "$eq", Value: bson.A{
+											"$$teams.team_id",
+											"$$this.team_id",
+										},
+										}}}}}}}}}}}}}}}}}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "users", Value: 0},
+			{Key: "teams.user_id", Value: 0},
+			{Key: "teams.user.team_id", Value: 0},
+			{Key: "teams.user.password", Value: 0},
+			{Key: "teams.user._id", Value: 0},
+			{Key: "teams.user.id", Value: 0},
+			{Key: "teams.user.created_at", Value: 0},
+			{Key: "teams.user.updated_at", Value: 0},
+		}}}}
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	cursor, err := standingsCollection.Aggregate(ctx, pipeline)
+	defer cancel()
+	if err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch teams")
+		return
+	}
+
+	var res entity.StandingsResponse
+
+	if err = cursor.All(ctx, &res.Standings); err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to parse teams")
+		return
+	}
+	defer cancel()
+	res.Status = "success"
+	rest.RenderJSON(w, res)
+}
+
+func teamStandingsResponseHandler(w http.ResponseWriter, r *http.Request) {
+
+	team_id := chi.URLParam(r, "id")
+
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.D{{Key: "teams.team_id", Value: team_id}}}},
 		{{Key: "$lookup", Value: bson.D{
 			{Key: "from", Value: "users"},
 			{Key: "localField", Value: "teams.team_id"},
