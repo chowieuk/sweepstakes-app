@@ -6,6 +6,7 @@ import (
 
 // StandingsResponse is used to construct requests and parse responses which include an array of standings
 type StandingsResponse struct {
+	Error     string          `json:"error,omitempty"`
 	Status    string          `json:"status"`
 	Standings []StandingsData `json:"data"`
 }

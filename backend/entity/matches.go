@@ -6,6 +6,7 @@ import (
 
 // MatchResponse is used to construct requests and parse responses which include an array of matches
 type MatchResponse struct {
+	Error   string      `json:"error,omitempty"`
 	Status  string      `json:"status"`
 	Matches []MatchData `json:"data"`
 }
