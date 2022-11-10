@@ -1,7 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export default function LeaderboardHeader() {
-  return (
-    <div>LEADERBOARD</div>
-  )
+  return <div>LEADERBOARD</div>;
 }
