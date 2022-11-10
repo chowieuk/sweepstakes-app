@@ -5,6 +5,7 @@ import "./Registration.css";
 
 export default function HomePageLoggedOn() {
   const [team, setTeam] = useState(false);
+  const [teamFlag, setTeamFlag] = useState(false);
 
   const getUserData = async () => {
     try {
@@ -21,6 +22,7 @@ export default function HomePageLoggedOn() {
         .then((res) => res.json())
         .then((data) => {
           setTeam(data.userInfo.attrs.team_name);
+          setTeamFlag(data.userInfo.attrs.team_flag);
         });
     } catch (err) {}
   };
