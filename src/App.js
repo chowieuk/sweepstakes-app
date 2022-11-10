@@ -52,15 +52,15 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-{/* public routes */}
+        {/* public routes */}
         <Route path="/" element={<Welcome />} />
         <Route path="/register" element={<Registration />} />
         <Route path="/success" element={<RegistrationSuccessful />} />
         <Route path="/fail" element={<RegistrationFail />} />
         <Route path="/login" element={<Login />} />
 
-{/* logged on routes */}
-        <Route path="/home" element={<HomePageLoggedOn />} />        
+        {/* logged on routes */}
+        <Route path="/home" element={<HomePageLoggedOn />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/matches" element={<Matches />} />
       </Routes>

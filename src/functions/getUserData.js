@@ -1,6 +1,7 @@
 export const getUserData = async () => {
   try {
-    const res = await fetch("http://localhost:8080/private_data", { //change endpoint as needed
+    const res = await fetch("http://localhost:8080/private_data", {
+      //change endpoint as needed
       method: "GET",
       headers: {
         "Content-Type": "application/json",

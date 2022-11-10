@@ -2,8 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ReactComponent as YourSvg } from "./world-cup.svg";
 
-
-import './Registration.css'
+import "./Registration.css";
 
 import "./Registration.css";
 export default function RegistrationSuccessful() {
@@ -15,10 +14,12 @@ export default function RegistrationSuccessful() {
         </div>
         <div className="post-reg-container-row2">
           <div className="post-reg-message">
-            You are now registered to the 2022 World Cup sweepstakes!<br/>
+            You are now registered to the 2022 World Cup sweepstakes!
+            <br />
             Please LOGIN below to view your team
           </div>
-          <Link className="button-container"
+          <Link
+            className="button-container"
             to="/login"
             style={{ textDecoration: "none", color: "none" }}
           >

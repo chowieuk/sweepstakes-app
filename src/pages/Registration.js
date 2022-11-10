@@ -35,7 +35,7 @@ function Registration() {
         }),
         headers: {
           "Content-Type": "application/json",
-          "Accept" : "application/json"
+          Accept: "application/json",
         },
       });
     } catch (err) {}
@@ -43,10 +43,9 @@ function Registration() {
 
   // Sends data after form is complete
   const onSubmit = (data) => {
-    registerUser(data)
-        .then(() => {
-      setRedirect(true)
-    })
+    registerUser(data).then(() => {
+      setRedirect(true);
+    });
   };
 
   if (redirect) return <Navigate to="/success" />;
@@ -108,9 +107,9 @@ function Registration() {
             {watch("password_repeat") !== watch("password") && (
               <p>password do not match</p>
             )}
-              <div className="submitButton">
-                <input type="submit" value="Register" disabled={!isValid} />
-              </div>
+            <div className="submitButton">
+              <input type="submit" value="Register" disabled={!isValid} />
+            </div>
           </form>
         </div>
       </div>

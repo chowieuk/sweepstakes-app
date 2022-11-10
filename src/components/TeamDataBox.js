@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 export default function TeamDataBox(props) {
   return (
@@ -6,5 +6,5 @@ export default function TeamDataBox(props) {
       <div className="databox-header"></div>
       <div className="databox-value">3</div>
     </div>
-  )
+  );
 }

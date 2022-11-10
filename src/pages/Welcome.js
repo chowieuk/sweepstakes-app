@@ -30,10 +30,7 @@ export default function Welcome() {
               Register
             </div>
           </Link>
-          <Link
-            to="/login"
-            style={{ textDecoration: "none", color: "none" }}
-          >
+          <Link to="/login" style={{ textDecoration: "none", color: "none" }}>
             <div className="button" action={"/"}>
               login
             </div>
