@@ -1,6 +1,7 @@
 import React from 'react'
 import {useRef, useEffect} from 'react';
 import {socialLogin, socialLoginErrorHandler} from '../functions/socialLogin';
+import normalGoogle from '../images/btn_google_signin_dark_normal_web.png';
 
 const GoogleLogin = () => {
 
@@ -27,7 +28,7 @@ const GoogleLogin = () => {
 
   return (
     <div>
-      <button ref={ref}>Login with Google</button>
+      <img ref={ref} src={normalGoogle} alt="Sign in with Google"/>
     </div>
   )
 }

@@ -1,9 +1,11 @@
 import React from 'react'
 import {useRef, useEffect} from 'react';
 import {socialLogin, socialLoginErrorHandler} from '../functions/socialLogin';
+import useFacebookSDK from "../hooks/useFacebookSDK";
 
 const FacebookLogin = () => {
 
+  useFacebookSDK(); 
   const ref = useRef(null);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ const FacebookLogin = () => {
 
   return (
     <div>
-      <button ref={ref}>Login with Facebook</button>
+      <div ref={ref} class="fb-login-button" data-width="" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="false" data-use-continue-as="false"></div>
     </div>
   )
 }
