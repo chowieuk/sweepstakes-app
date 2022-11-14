@@ -71,6 +71,26 @@ func UserInCollection(userCollection *mongo.Collection, user token.User) (bool, 
 	return false, nil
 }
 
+func SwapEmailNameClaims(userCollection *mongo.Collection, claims *token.Claims) error {
+	var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	log.Printf("[INFO] attempting to swap claims for user %v", claims.User.Name)
+
+	var newUser entity.User
+
+	err := userCollection.FindOne(ctx, bson.M{"id": claims.User.ID}).Decode(&newUser)
+	defer cancel()
+
+	if err != nil {
+		log.Printf("[DEBUG] failed when attempting to find user %s (ID: %s)", claims.User.Email, claims.User.ID)
+		return err
+	}
+
+	claims.User.Email = newUser.Email
+	claims.User.Name = newUser.Full_Name
+
+	return nil
+}
+
 // AddSocialUser Adds a social login user (Google or Facebook) to our users collection
 func AddSocialUser(userCollection *mongo.Collection, user token.User) error {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)

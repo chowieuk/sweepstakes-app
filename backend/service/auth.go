@@ -48,6 +48,19 @@ func InitializeAuth(userCollection *mongo.Collection, teamCollection *mongo.Coll
 				claims.User.SetStrAttr("custom-key", "some value")
 			} else if claims.User != nil {
 
+				if strings.HasPrefix(claims.User.ID, "mongo_") {
+					err := repo.SwapEmailNameClaims(userCollection, &claims)
+
+					if err != nil {
+						if err == mongo.ErrNoDocuments {
+							log.Printf("[INFO] no user with that ID found.")
+						}
+						if err != nil {
+							log.Printf("[DEBUG] error swapping claims names %v", err)
+						}
+					}
+				}
+
 				// Check if the user is in the db
 				inDb, err := repo.UserInCollection(userCollection, *claims.User)
 				if err != nil {
