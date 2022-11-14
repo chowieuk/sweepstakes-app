@@ -90,4 +90,88 @@
       text-decoration: none;
     }
   }
+  
+  .social-login-container {
+    width: 220px;
+    position: relative;
+}
+
+.social-buttons {
+height: 100%;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.s-btn {
+min-width: 162px;
+position: relative;
+display: inline-block;
+padding: 6px 8px;
+margin: 3px 20px;
+border: 1px solid transparent;
+border-radius: 3px;
+outline: none;
+font-family: inherit;
+font-size: 13px;
+font-weight: normal;
+line-height: calc((13 + 2) / 13);
+text-align: center;
+text-decoration: none;
+cursor: pointer;
+user-select: none;
+}
+
+.s-btn__facebook {
+border-color: transparent;
+background-color: #385499;
+color: #fff;
+}
+
+.s-btn__facebook:hover, .s-btn__facebook:focus {
+background-color: #314a86;
+color: #fff;
+}
+
+.s-btn__facebook:active {
+background-color: #2a4074;
+color: #fff;
+}
+
+.s-btn__google {
+border-color: hsl(210,8%,85%);
+background-color: white;
+color: hsl(210,8%,25%);
+}
+
+.s-btn__google:hover, .s-btn__google:focus {
+border-color: hsl(210,8%,75%);
+background-color: hsl(210,8%,97.5%);
+color: hsl(210,8%,15%);
+}
+
+.s-btn__google:active {
+background-color: hsl(210,8%,95%);
+color: hsl(210,8%,5%);
+}
+
+.s-btn__icon .svg-icon {
+vertical-align: baseline;
+margin-top: -0.3em;
+margin-bottom: -0.3em;
+transition: opacity 200ms cubic-bezier(.165, .84, .44, 1);
+}
+
+.svg-icon:not(.native) * {
+fill: currentColor;
+}
 }
