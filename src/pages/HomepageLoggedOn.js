@@ -27,9 +27,6 @@ export default function HomePageLoggedOn() {
         credentials: 'include',
         headers: {
           "Content-Type": "application/json",
-          // "Access-Control-Allow-Origin": "*",
-          // "Access-Control-Allow-Headers":
-          //   "Origin, X-Requested-With, Content-Type, Accept",
         },
       })
         .then((res) => res.json())
@@ -62,16 +59,11 @@ export default function HomePageLoggedOn() {
         </div>
         <div className="post-reg-container-row2">
           <div className="post-reg-message">
-            {/* Your team is {team}!
-            <img className="flag-image" src={teamFlag}/> */}
             <div className='smallViewport'>
               <InfiniteLooper speed={1.5} direction="right" animState="true" userTeam={team}>
                 <Flags flags={flags}/>
               </InfiniteLooper>
             </div>
-            {/* <button onClick={setFlags(updatedFlagArray)}>
-            Test Button
-            </button> */}
           </div>
         </div>
       </div>
