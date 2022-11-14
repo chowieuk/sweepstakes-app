@@ -116,6 +116,7 @@ form .input-box span.details {
   display: flex;
   justify-content: center;
   text-align: center;
+  flex-direction: column;
 }
 
 .button-container {
@@ -164,6 +165,11 @@ form .input-box span.details {
   .post-reg-text {
     font-size: 24px;
   }
+}
+
+.flag-image {
+  max-width: 200px;
+  margin: auto;
 }
 
 /*# sourceMappingURL=Registration.css.map */
