@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/sha1"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -134,6 +133,10 @@ func main() {
 	}))
 	router.Post("/register", registrationHandler) // post registration route
 	router.Group(func(r chi.Router) {
+		r.Use(rest.Throttle(100))
+		router.Get("/api/availableteams", availableTeamCount) // get available teams route
+	})
+	router.Group(func(r chi.Router) {
 		r.Use(m.Auth)
 		r.Use(m.UpdateUser(middleware.UserUpdFunc(func(user token.User) token.User {
 			return user
@@ -243,20 +246,21 @@ func registrationHandler(w http.ResponseWriter, r *http.Request) {
 
 	team, err := repo.RandomUnassignedTeam(teamCollection, ctx)
 
-	if err != nil {
-		if err == errors.New("randomUnassignedTeam: all teams are assigned") {
-			//TODO: consider waiting list user story?
-			rest.SendErrorJSON(w, r, log.Default(), http.StatusForbidden, err, "all teams have been allocated")
-			return
-		}
+	if err != nil && err != repo.ErrNoTeams {
 		log.Printf("[DEBUG] error getting random team : %v", err)
 		return
 	}
 
-	err = allocateTeam(team, &user, ctx)
-	if err != nil {
-		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to allocate team")
-		return
+	if err == repo.ErrNoTeams {
+		//TODO: consider waiting list user story?
+		log.Printf("[DEBUG] all teams allocated. Adding user to waiting list: %v", err)
+		user.Team_id = ""
+	} else {
+		err = allocateTeam(team, &user, ctx)
+		if err != nil {
+			rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to allocate team")
+			return
+		}
 	}
 
 	resultInsertionNumber, insertErr := userCollection.InsertOne(ctx, user)
@@ -291,6 +295,27 @@ func allocateTeam(team entity.TeamData, user *entity.User, ctx context.Context) 
 	user.Team_id = team.Team_id
 	log.Printf("[INFO] successfully allocated %s (id %s) to %s (id %s)\n", team.Name, team.Team_id, user.Email, user.ID)
 	return nil
+}
+
+func availableTeamCount(w http.ResponseWriter, r *http.Request) {
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+	count, err := teamCollection.CountDocuments(ctx, bson.M{"user_id": primitive.Null{}})
+	defer cancel()
+	if err != nil {
+		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch available teams")
+		return
+	}
+
+	res := struct {
+		TS             time.Time `json:"ts"`
+		AvailableTeams int64     `json:"availableTeams"`
+	}{
+		TS:             time.Now(),
+		AvailableTeams: count,
+	}
+
+	rest.RenderJSON(w, res)
 }
 
 // GET /private_data returns json with user info and ts

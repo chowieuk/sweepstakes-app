@@ -19,6 +19,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var ErrNoTeams = errors.New("randomUnassignedTeam: all teams are assigned")
+
 // DBinstance func creates a new mongo client with URI provided in .env
 func DBinstance() *mongo.Client {
 	err := godotenv.Load(".env.production.local")
@@ -150,7 +152,7 @@ func RandomUnassignedTeam(teamCollection *mongo.Collection, ctx context.Context)
 
 	if cursor.RemainingBatchLength() < 1 {
 		log.Printf("[DEBUG] no more teams are available")
-		return entity.TeamData{Name: "Waiting List"}, errors.New("randomUnassignedTeam: all teams are assigned")
+		return entity.TeamData{Name: "Waiting List"}, ErrNoTeams
 	}
 	if err != nil {
 		log.Printf("[DEBUG] error durring aggregation: %v", err)
