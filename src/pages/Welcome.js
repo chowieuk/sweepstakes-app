@@ -38,9 +38,12 @@ export default function Welcome() {
               login
             </div>
           </Link>
-          <GoogleLogin/>
-          <FacebookLogin/>
-          <DevLogin/>
+          <div className="social-login-container">
+            <div className="social-buttons">
+              <GoogleLogin/>
+              <FacebookLogin/>
+            </div>
+          </div>
         </div>
       </div>
     </>
