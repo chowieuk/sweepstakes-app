@@ -177,6 +177,7 @@ transition: opacity 200ms cubic-bezier(.165, .84, .44, 1);
   margin: auto;
   margin-top: 0;
   margin-bottom: 0;
+  text-align: center;
 }
 
 /*# sourceMappingURL=welcome.css.map */

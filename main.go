@@ -71,8 +71,8 @@ func main() {
 	c := cron.New()
 	// matchesInterval runs every 30th minute from 10am to 7pm London time
 	matchesInterval := "CRON_TZ=Europe/London */30 10-19 * * *"
-	// standingsInterval runs every 31st minute from 10am to 7pm London time
-	standingsInterval := "CRON_TZ=Europe/London */31 10-19 * * *"
+	// standingsInterval runs every 32nd minute from 10am to 7pm London time
+	standingsInterval := "CRON_TZ=Europe/London */32 10-19 * * *"
 	log.Printf("[INFO]\nCron job set to update data on the following schedule:\nMatches: %v\nStandings data '%v'", matchesInterval, standingsInterval)
 
 	matchesCronJob := cron.FuncJob(func() {

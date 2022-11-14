@@ -72,7 +72,8 @@ export default function Welcome() {
         </div>
 
         <div className="remaining-teams-wrapper">
-          <h2>There are {teamCount} teams remaining!</h2>
+          {(teamCount > 0) ? <h2>There are {teamCount} teams remaining!</h2> : <></>}
+          <p>Registrants will be added to the waiting list if no teams are available</p>
         </div>
       </div>
     </>
