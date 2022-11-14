@@ -103,7 +103,9 @@ func InitializeAuth(userCollection *mongo.Collection, teamCollection *mongo.Coll
 					claims.User.SetStrAttr("team_flag", team.Flag)
 				}
 				if team.Name == "" {
+					log.Printf("[INFO] Adding user to waiting list")
 					claims.User.SetStrAttr("team_name", "Waiting List")
+					claims.User.SetStrAttr("team_flag", "https://commons.wikimedia.org/wiki/Category:Red_X_icons#/media/File:Arbcom_ru_declined.svg")
 				}
 			}
 			return claims
