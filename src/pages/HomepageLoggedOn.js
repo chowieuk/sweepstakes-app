@@ -31,7 +31,7 @@ export default function HomePageLoggedOn() {
       })
         .then((res) => res.json())
         .then((data) => {
-          setUserName(data.userInfo.name);
+          setUserName(data.userInfo.name.split(" ")[0]);
           setTeam(data.userInfo.attrs.team_name);
           setTeamFlag(data.userInfo.attrs.team_flag);
         });
