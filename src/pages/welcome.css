@@ -7,7 +7,7 @@
   height: 100vh;
 }
 .welcome-wrapper .welcome-container .welcome-container-row1 {
-  padding-top: 40vh;
+  /* padding-top: 40vh; */
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -33,7 +33,7 @@
 @media (max-width: 500px) {
   .welcome-wrapper .welcome-container .welcome-container-row1 .welcome-text {
     color: white;
-    flex-direction: row;
+    flex-direction: column;
     text-align: center;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     font-style: oblique;
@@ -60,36 +60,38 @@
     font-size: 14px;
   }
 }
-.welcome-wrapper .button-container {
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  text-align: center;
-  color: white;
-  padding-bottom: 50vh;
-}
-.welcome-wrapper .button-container .button {
-  max-width: 300px;
-  width: 80%;
-  padding: 20px 40px;
-  margin: 40px 20px;
-  background-color: #2702cd;
-  color: white;
-  text-align: center;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  text-align: center;
-  text-decoration: none;
+
+@media only screen and (max-width: 500px) {
+  .button-container  {
+    flex-direction:column;
+  }
+
+  .button-container a {
+    margin: auto;
+  }
+
+  .button-container .button {
+    margin: 10px 20px;
+    min-width: 162px;
+  }
+
+  .button {
+    margin: auto;
+  }
+
+  .social-login-container {
+    width: unset;
+  }
+ 
 }
 
-.social-login-container {
+@media only screen and (min-width: 768px) {
+    .social-login-container {
       width: 220px;
       position: relative;
-}
+  }
 
-.social-buttons {
+  .social-buttons {
   height: 100%;
     position: absolute;
     left: 0;
@@ -103,7 +105,10 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+  }
 }
+
+
 
 .s-btn {
   min-width: 162px;

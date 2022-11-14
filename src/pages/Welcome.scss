@@ -10,7 +10,7 @@
   height: 100vh;
   .welcome-container {
     .welcome-container-row1 {
-      padding-top: 40vh;
+      /* padding-top: 40vh; */
       display: flex;
       flex-direction: row;
       justify-content: center;
@@ -60,20 +60,44 @@
             justify-content: center;
             text-align: center;
             font-size: 14px;
+            padding: 0 10%;
           }
       }
     }
   }
 
+  @media only screen and (max-width: 768px) {
+    .button-container  {
+      flex-direction: column !important;
+    }
+
+    .button-container a {
+      margin: auto;
+    }
+
+    .button-container .button {
+      margin: 10px 20px;
+      min-width: 162px;
+    }
+
+    .button {
+      margin: auto;
+    }
+
+    .social-login-container {
+      width: unset;
+    }
+    
+  }
 
   .button-container {
-    padding-top: 10vh;
+    /* padding-top: 10vh; */
     display: flex;
     flex-direction: row;
     justify-content: center;
     text-align: center;
     color: white;
-    padding-bottom: 50vh;
+    /* padding-bottom: 50vh; */
 
     .button {
       max-width: 300px;
