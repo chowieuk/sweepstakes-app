@@ -134,7 +134,7 @@ func main() {
 	router.Post("/register", registrationHandler) // post registration route
 	router.Group(func(r chi.Router) {
 		r.Use(rest.Throttle(100))
-		router.Get("/api/availableteams", availableTeamCount) // get available teams route
+		router.Get("/api/v1/availableteams", availableTeamCount) // get available teams route
 	})
 	router.Group(func(r chi.Router) {
 		r.Use(m.Auth)
@@ -306,6 +306,8 @@ func availableTeamCount(w http.ResponseWriter, r *http.Request) {
 		rest.SendErrorJSON(w, r, log.Default(), http.StatusInternalServerError, err, "failed to fetch available teams")
 		return
 	}
+
+	// _, _ = w.Write([]byte(strconv.Itoa(int(count))))
 
 	res := struct {
 		TS             time.Time `json:"ts"`

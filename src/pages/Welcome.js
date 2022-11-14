@@ -1,4 +1,5 @@
 import React from "react";
+import {useRef, useEffect, useState} from 'react';
 import { Link } from "react-router-dom";
 import { ReactComponent as YourSvg } from "./world-cup.svg";
 
@@ -6,7 +7,31 @@ import GoogleLogin from "../components/GoogleLogin";
 import FacebookLogin from "../components/FacebookLogin";
 import DevLogin from "../components/DevLogin";
 import "./welcome.css";
+
 export default function Welcome() {
+  const [teamCount, setTeamCount] = useState("?")
+  
+  const getTeamCount = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/v1/availableteams", {
+        //change endpoint as needed
+        method: "GET",
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setTeamCount(data.availableTeams);
+        });
+    } catch (err) {}
+  };
+
+  useEffect(() => {
+    getTeamCount();
+  }, []);
+
   return (
     <>
       <div className="welcome-wrapper">
@@ -44,6 +69,10 @@ export default function Welcome() {
               <FacebookLogin/>
             </div>
           </div>
+        </div>
+
+        <div className="remaining-teams-wrapper">
+          <h2>There are {teamCount} teams remaining!</h2>
         </div>
       </div>
     </>

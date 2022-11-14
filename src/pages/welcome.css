@@ -173,4 +173,10 @@ transition: opacity 200ms cubic-bezier(.165, .84, .44, 1);
   fill: currentColor;
 }
 
+.remaining-teams-wrapper {
+  margin: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 /*# sourceMappingURL=welcome.css.map */
