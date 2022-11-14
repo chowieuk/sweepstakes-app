@@ -2,6 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ReactComponent as YourSvg } from "./world-cup.svg";
 
+import GoogleLogin from "../components/GoogleLogin";
+import FacebookLogin from "../components/FacebookLogin";
+import DevLogin from "../components/DevLogin";
 import "./welcome.css";
 export default function Welcome() {
   return (
@@ -35,6 +38,12 @@ export default function Welcome() {
               login
             </div>
           </Link>
+          <div className="social-login-container">
+            <div className="social-buttons">
+              <GoogleLogin/>
+              <FacebookLogin/>
+            </div>
+          </div>
         </div>
       </div>
     </>
