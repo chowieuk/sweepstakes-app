@@ -11,6 +11,8 @@ require (
 	go.mongodb.org/mongo-driver v1.10.3
 )
 
+require github.com/robfig/cron/v3 v3.0.0
+
 require (
 	cloud.google.com/go/compute v1.10.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect

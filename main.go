@@ -15,8 +15,11 @@ import (
 	"github.com/chowieuk/sweepstakes-app/backend/repo"
 	"github.com/chowieuk/sweepstakes-app/backend/service"
 
+	"github.com/robfig/cron/v3"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+
 	"github.com/go-pkgz/auth/middleware"
 	"github.com/go-pkgz/auth/token"
 	log "github.com/go-pkgz/lgr"
@@ -37,6 +40,8 @@ var teamCollection *mongo.Collection = repo.OpenCollection(Client, "teams")
 var matchesCollection *mongo.Collection = repo.OpenCollection(Client, "matches")
 var standingsCollection *mongo.Collection = repo.OpenCollection(Client, "standings")
 
+var apiToken, apiUser, apiPass string
+
 func main() {
 
 	err := godotenv.Load(".env.production.local")
@@ -45,9 +50,69 @@ func main() {
 		log.Fatalf("Error loading .env file")
 	}
 
+	if apiUser = os.Getenv("FIFA_API_USER"); apiUser == "" {
+		log.Fatalf("[FATAL] You must set your 'FIFA_API_USER' environmental variable.")
+	}
+	if apiPass = os.Getenv("FIFA_API_PASS"); apiPass == "" {
+		log.Fatalf("[FATAL] You must set your 'FIFA_API_PASS' environmental variable.")
+	}
+
+	if apiToken = os.Getenv("FIFA_API_TOKEN"); apiToken == "" {
+		log.Print("[INFO] You haven't set your 'FIFA_API_TOKEN' environmental variable.")
+		var err error
+		apiToken, err = repo.LoginToAPI(apiUser, apiPass)
+		if err != nil {
+			log.Fatalf("[FATAL] Couldn't acquire API token: %v", err)
+		}
+	}
+
 	log.Setup(log.Debug, log.Msec, log.LevelBraces, log.CallerFile, log.CallerFunc) // setup default logger with go-pkgz/lgr
 
-	authService := service.InitializeAuth(userCollection)
+	// initialize cron job for data update
+	c := cron.New()
+	// matchesInterval runs every 30th minute from 10am to 7pm London time
+	matchesInterval := "CRON_TZ=Europe/London */30 10-19 * * *"
+	// standingsInterval runs every 31st minute from 10am to 7pm London time
+	standingsInterval := "CRON_TZ=Europe/London */31 10-19 * * *"
+	log.Printf("[INFO]\nCron job set to update data on the following schedule:\nMatches: %v\nStandings data '%v'", matchesInterval, standingsInterval)
+
+	matchesCronJob := cron.FuncJob(func() {
+		log.Printf("[INFO] Initiating scheduled matches data update")
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		matches, err := repo.FetchMatches(apiToken, apiUser, apiPass)
+		if err != nil {
+			log.Printf("[CRITICAL] error fetching match data:", err)
+			return
+		}
+
+		if err := repo.UpdateMatches(matchesCollection, matches, ctx); err != nil {
+			log.Fatalf("[CRITICAL] recieved error updating match data: ", err)
+			return
+		}
+	})
+
+	standingsCronJob := cron.FuncJob(func() {
+		log.Printf("[INFO] Initiating scheduled standings data update")
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		standings, err := repo.FetchStandings(apiToken, apiUser, apiPass)
+		if err != nil {
+			log.Printf("[CRITICAL] error fetching standings data:", err)
+			return
+		}
+
+		if err := repo.UpdateStandings(standingsCollection, standings, ctx); err != nil {
+			log.Fatalf("[CRITICAL] recieved error updating standings data: ", err)
+			return
+		}
+	})
+
+	c.AddJob(matchesInterval, matchesCronJob)
+	c.AddJob(standingsInterval, standingsCronJob)
+	c.Start()
+
+	authService := service.InitializeAuth(userCollection, teamCollection)
 
 	// retrieve auth middleware
 	m := authService.Middleware()
