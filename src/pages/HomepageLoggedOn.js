@@ -20,7 +20,6 @@ export default function HomePageLoggedOn() {
   const [userName, setUserName] = useState(false);
 
   const getUserData = async () => {
-    //console.log("test")
     try {
       const res = await fetch("http://localhost:8080/private_data", {
         //change endpoint as needed
@@ -42,13 +41,9 @@ export default function HomePageLoggedOn() {
     } catch (err) {}
   };
 
-  const updatedFlagArray = () => {
-    let newFlags = flags.slice();
-    newFlags.unshift(teamFlag)
-    return newFlags
-  }
-
-  getUserData();
+  useEffect(() => {
+    getUserData();
+  }, []);
 
   useEffect(() => {
     setFlags([
