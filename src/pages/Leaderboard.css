@@ -2,7 +2,7 @@
   color: white;
 }
 
-.leadercard-container {
+.leaderboardCard {
   background-color: #171819;
   display: flex;
   flex-direction: row;
@@ -11,33 +11,33 @@
   padding: 15px 0px;
   border-bottom: 1px solid #444548;
 }
-.leadercard-container .team-container {
+.leaderboardCard .team-container {
   display: flex;
   align-items: center;
   gap: 35px;
   min-width: 350px;
 }
-.leadercard-container .team-container .team-icon {
+.leaderboardCard .team-container .team-icon {
   display: flex;
   justify-content: flex-start;
   padding: 0px 10px;
   width: 24px;
   height: 24px;
 }
-.leadercard-container .teamdata-container {
+.leaderboardCard .teamdata-container {
   display: flex;
   text-align: center;
   align-self: flex-end;
 }
-.leadercard-container .teamdata-container .teamdata-box {
+.leaderboardCard .teamdata-container .teamdata-box {
   display: block;
 }
-.leadercard-container .teamdata-container .teamdata-box .databox-header {
+.leaderboardCard .teamdata-container .teamdata-box .databox-header {
   padding: 12px;
 }
-.leadercard-container .teamdata-container .teamdata-box .databox-value {
+.leaderboardCard .teamdata-container .teamdata-box .databox-value {
   background-color: #444548;
   padding: 12px;
 }
 
-/*# sourceMappingURL=Leaderboardcard.css.map */
+/*# sourceMappingURL=Leaderboard.css.map */

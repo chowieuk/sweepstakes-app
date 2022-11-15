@@ -1,6 +1,6 @@
 import React from "react";
 
-import "./Leaderboardcard.css";
+import "../pages/Leaderboard.css";
 
 // Components
 import TeamDataContainer from "./TeamDataContainer";
@@ -8,7 +8,7 @@ import TeamDataContainer from "./TeamDataContainer";
 export default function (props) {
   return (
     <div>
-      <div className="leadercard-container">
+      <div className="leaderboardCard">
         <div className="team-container">
           <div className="team-icon">
             <img alt="" src={props.team.flag} />
