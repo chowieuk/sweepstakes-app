@@ -1,13 +1,14 @@
-.leaderboard-container {
-  border: 1px solid green;
-  position: fixed;
-
-}
 
 
 // Leaderboard Header
 
 .leaderboard-header {
+  background-color: #303134;
+  color: white;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
 }
 
 //leadercard
@@ -34,6 +35,7 @@
       width: 24px;
       height: 24px;
     }
+
 
     // .team-text {
 

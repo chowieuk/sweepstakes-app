@@ -1,6 +1,10 @@
-.leaderboard-container {
-  border: 1px solid green;
-  position: fixed;
+.leaderboard-header {
+  background-color: #303134;
+  color: white;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
 }
 
 .leaderboardCard {
@@ -46,6 +50,4 @@
 .leaderboardCard .teamdata-container .teamdata-box .databox-value {
   background-color: #444548;
   padding: 12px;
-}
-
-/*# sourceMappingURL=Leaderboard.css.map */
+}/*# sourceMappingURL=Leaderboard.css.map */
