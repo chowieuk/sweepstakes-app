@@ -55,7 +55,7 @@ export default function Leaderboard() {
 
   return (
     // <></>
-    <div>
+    <div className="top-wrapper">
       {loading ? (
         <Spinner animation="border" variant="primary" />
       ) : (
