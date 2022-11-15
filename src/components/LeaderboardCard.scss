@@ -9,7 +9,7 @@
   justify-content: space-between;
   gap: 40px;
   padding: 15px 0px;
-  border-radius: 5px;
+  border-bottom: 1px solid #444548;
 
   .team-container {
     display: flex;
@@ -33,18 +33,16 @@
   .teamdata-container {
     display: flex;
     text-align: center;
-    padding: 10px;
-    margin: 10px;
     align-self: flex-end;
 
     .teamdata-box {
       display: block;
       .databox-header {
-        padding: 15px;
+        padding: 12px;
       }
       .databox-value {
         background-color: #444548;
-        padding: 15px;
+        padding: 12px;
       }
     }
   }

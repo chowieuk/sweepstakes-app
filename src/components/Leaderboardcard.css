@@ -9,7 +9,7 @@
   justify-content: space-between;
   gap: 40px;
   padding: 15px 0px;
-  border-radius: 5px;
+  border-bottom: 1px solid #444548;
 }
 .leadercard-container .team-container {
   display: flex;
@@ -27,19 +27,17 @@
 .leadercard-container .teamdata-container {
   display: flex;
   text-align: center;
-  padding: 10px;
-  margin: 10px;
   align-self: flex-end;
 }
 .leadercard-container .teamdata-container .teamdata-box {
   display: block;
 }
 .leadercard-container .teamdata-container .teamdata-box .databox-header {
-  padding: 15px;
+  padding: 12px;
 }
 .leadercard-container .teamdata-container .teamdata-box .databox-value {
   background-color: #444548;
-  padding: 15px;
+  padding: 12px;
 }
 
 /*# sourceMappingURL=Leaderboardcard.css.map */
