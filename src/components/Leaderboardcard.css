@@ -15,6 +15,7 @@
   display: flex;
   align-items: center;
   gap: 35px;
+  min-width: 350px;
 }
 .leadercard-container .team-container .team-icon {
   display: flex;
@@ -26,7 +27,9 @@
 .leadercard-container .teamdata-container {
   display: flex;
   text-align: center;
-  padding: 0px 10px;
+  padding: 10px;
+  margin: 10px;
+  align-self: flex-end;
 }
 .leadercard-container .teamdata-container .teamdata-box {
   display: block;

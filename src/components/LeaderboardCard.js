@@ -14,12 +14,13 @@ export default function (props) {
             <img alt="" src={props.team.flag} />
           </div>
           <div className="team-text">{props.team.name_en} - Hakim</div>
-          <TeamDataContainer
+         
+        </div>
+        <TeamDataContainer
             className="teamdata-container"
             stats={props.team}
           />
-        </div>
-      </div>
+       </div>
     </div>
   );
 }
