@@ -6,7 +6,9 @@ import Container from "react-bootstrap/Container";
 import "./Leaderboard.css";
 
 //components
+import LeaderboardContainer from "../components/LeaderboardContainer";
 import LeaderboardCard from "../components/LeaderboardCard";
+import LeaderboardWrapper from "../components/LeaderboardWrapper";
 
 // Import Dummy Data DELETE LATER
 const dummyStandingData = require("./standingdummydata.json");
@@ -57,16 +59,18 @@ export default function Leaderboard() {
       {loading ? (
         <Spinner animation="border" variant="primary" />
       ) : (
-        dummyStandingData.data.map((group) => {
-          // UPDATE THIS TO standingData and uncomment the above useEffect
-          return (
-            <div key={group._id}>
-              {group.teams.map((team) => {
-                return <LeaderboardCard team={team} key={team.team_id} />;
-              })}
-            </div>
-          );
-        })
+      <LeaderboardContainer data={dummyStandingData.data} />
+
+        // dummyStandingData.data.map((group) => {
+        //   // UPDATE THIS TO standingData and uncomment the above useEffect
+        //   return (
+        //     <div key={group._id}>
+        //       {group.teams.map((team) => {
+        //         return <LeaderboardCard team={team} key={team.team_id} />;
+        //       })}
+        //     </div>
+        //   );
+        // })
       )}
     </div>
   );
