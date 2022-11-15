@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Spinner from "react-bootstrap/Spinner";
+import Container from "react-bootstrap/Container";
+
+import "./Leaderboard.css"
 
 //components
 import LeaderboardCard from "../components/LeaderboardCard";
@@ -11,19 +14,15 @@ import LeaderboardCard from "../components/LeaderboardCard";
 const getStandingData = async () => {
 
   try {
-    return fetch("http://localhost:8080/api/v1/standing", {
+    return fetch("http://localhost:8080/api/v1/standings", {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers":
-          "Origin, X-Requested-With, Content-Type, Accept",
+        "Content-Type": "application/json"
       },
     }).then((res) => res.json());
   } catch (err) {}
 };
 
-// bearer token login for old http request
 // const getToken = async () => {
 //   return fetch("/user/login", {
 //     method: "POST",
@@ -46,21 +45,23 @@ export default function Leaderboard() {
 
   useEffect(() => {
     getStandingData()
+      // .then((res) => console.log(res.data))
       .then((res) => setStandingData(JSON.parse(JSON.stringify(res.data))))
       .then(() => setLoading(false))
       .catch(console.error);
 
-    setLoading(false);
   }, []);
 
 
 console.log(standingData)
+
   return (
+  // <></>
     <div>
       {loading ? (
         <Spinner animation="border" variant="primary" />
       ) : (
-        standingData.data.map((group) => {
+        standingData.map((group) => {
           // UPDATE THIS TO standingData and uncomment the above useEffect
           return (
             <div key={group._id}>
