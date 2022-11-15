@@ -1,16 +1,25 @@
 .leadercard-container {
+
+
+}
+
+
+//leadercard
+.leaderboardCard {
   background-color: #171819;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   gap: 40px;
   padding: 15px 0px;
-  border-radius: 5px;
+  border-bottom: 1px solid #444548;
 
   .team-container {
     display: flex;
     align-items: center;
     gap: 35px;
+    min-width: 350px;
+
     .team-icon {
       display: flex;
       justify-content: flex-start;
@@ -18,21 +27,25 @@
       width: 24px;
       height: 24px;
     }
+
+    // .team-text {
+    
+    // }
   }
 
   .teamdata-container {
     display: flex;
     text-align: center;
-    padding: 0px 10px;
+    align-self: flex-end;
 
     .teamdata-box {
       display: block;
       .databox-header {
-        padding: 15px;
+        padding: 12px;
       }
       .databox-value {
         background-color: #444548;
-        padding: 15px;
+        padding: 12px;
       }
     }
   }

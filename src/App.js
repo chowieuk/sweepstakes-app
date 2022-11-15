@@ -55,11 +55,10 @@ function App() {
         {/* public routes */}
         <Route path="/" element={<Welcome />} />
         <Route path="/register" element={<Registration />} />
+        {/* logged on routes */}
         <Route path="/success" element={<RegistrationSuccessful />} />
         <Route path="/fail" element={<RegistrationFail />} />
         <Route path="/login" element={<Login />} />
-
-        {/* logged on routes */}
         <Route path="/home" element={<HomePageLoggedOn />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/matches" element={<Matches />} />
