@@ -102,7 +102,8 @@ form .input-box span.details {
   color: white;
   flex-direction: row;
   text-align: center;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   font-style: oblique;
   font-weight: 200;
   font-size: 50px;
@@ -205,7 +206,7 @@ form .input-box span.details {
 }
 
 .looper__innerList[data-animate="true"] .looper__listInstance {
-  animation: slideAnim linear infinite;   
+  animation: slideAnim linear infinite;
 }
 
 .looper__listInstance {
@@ -242,7 +243,7 @@ body {
   background: linear-gradient(-45deg, #4c468b, #05031a);  
 } */
 .description {
-  margin-bottom: 16px;  
+  margin-bottom: 16px;
   text-align: center;
 }
 .contentBlock {
@@ -251,7 +252,7 @@ body {
   justify-content: center;
   height: 120px;
   margin: 10px;
-  padding: 16px; 
+  padding: 16px;
   font-weight: 600;
   text-align: center;
   border-radius: 16px;
@@ -261,11 +262,11 @@ body {
   width: 100%;
 }
 
-.contentBlock--one {  
+.contentBlock--one {
   width: 120px;
-  background: rgba(255, 255, 255, 0.05);    
+  background: rgba(255, 255, 255, 0.05);
   font-weight: 600;
-  font-size: 18px; 
+  font-size: 18px;
 }
 .contentBlock--one:last-of-type {
   color: var(--green);

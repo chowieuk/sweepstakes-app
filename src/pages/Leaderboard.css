@@ -1,4 +1,5 @@
 .leaderboardCard {
+  color: white;
   background-color: #171819;
   display: flex;
   flex-direction: row;
@@ -25,8 +26,14 @@
   text-align: center;
   align-self: flex-end;
 }
+@media only screen and (max-width: 775px) {
+  .leaderboardCard .teamdata-container {
+    display: none;
+  }
+}
 .leaderboardCard .teamdata-container .teamdata-box {
   display: block;
+  min-width: 50px;
 }
 .leaderboardCard .teamdata-container .teamdata-box .databox-header {
   padding: 12px;
