@@ -10,7 +10,7 @@
   height: 100vh;
   .welcome-container {
     .welcome-container-row1 {
-      padding-top: 40vh;
+      /* padding-top: 40vh; */
       display: flex;
       flex-direction: row;
       justify-content: center;
@@ -24,6 +24,7 @@
         filter: brightness(0.2) invert(1);
       }
       .welcome-text {
+        color: white;
         flex-direction: row;
         text-align: center;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -32,26 +33,71 @@
         font-style: oblique;
         font-weight: 200;
         font-size: 66px;
+          @media (max-width: 500px) {
+            color: white;
+            flex-direction: row;
+            text-align: center;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+              Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+              sans-serif;
+            font-style: oblique;
+            font-weight: 200;
+            font-size: 55px;
+          }
       }
     }
     .welcome-container-row2 {
       padding: 2px;
       justify-content: center;
       .welcome-message {
+        color: white;
         display: flex;
         justify-content: center;
+        text-align: center;
+          @media (max-width: 500px) {
+            color: white;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+            font-size: 14px;
+            padding: 0 10%;
+          }
       }
     }
   }
 
+  @media only screen and (max-width: 768px) {
+    .button-container  {
+      flex-direction: column !important;
+    }
+
+    .button-container a {
+      margin: auto;
+    }
+
+    .button-container .button {
+      margin: 10px 20px;
+      min-width: 162px;
+    }
+
+    .button {
+      margin: auto;
+    }
+
+    .social-login-container {
+      width: unset;
+    }
+    
+  }
+
   .button-container {
-    padding-top: 10vh;
+    /* padding-top: 10vh; */
     display: flex;
     flex-direction: row;
     justify-content: center;
     text-align: center;
     color: white;
-    padding-bottom: 50vh;
+    /* padding-bottom: 50vh; */
 
     .button {
       max-width: 300px;
@@ -68,4 +114,88 @@
       text-decoration: none;
     }
   }
+  
+  .social-login-container {
+    width: 220px;
+    position: relative;
+}
+
+.social-buttons {
+height: 100%;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.s-btn {
+min-width: 162px;
+position: relative;
+display: inline-block;
+padding: 6px 8px;
+margin: 3px 20px;
+border: 1px solid transparent;
+border-radius: 3px;
+outline: none;
+font-family: inherit;
+font-size: 13px;
+font-weight: normal;
+line-height: calc((13 + 2) / 13);
+text-align: center;
+text-decoration: none;
+cursor: pointer;
+user-select: none;
+}
+
+.s-btn__facebook {
+border-color: transparent;
+background-color: #385499;
+color: #fff;
+}
+
+.s-btn__facebook:hover, .s-btn__facebook:focus {
+background-color: #314a86;
+color: #fff;
+}
+
+.s-btn__facebook:active {
+background-color: #2a4074;
+color: #fff;
+}
+
+.s-btn__google {
+border-color: hsl(210,8%,85%);
+background-color: white;
+color: hsl(210,8%,25%);
+}
+
+.s-btn__google:hover, .s-btn__google:focus {
+border-color: hsl(210,8%,75%);
+background-color: hsl(210,8%,97.5%);
+color: hsl(210,8%,15%);
+}
+
+.s-btn__google:active {
+background-color: hsl(210,8%,95%);
+color: hsl(210,8%,5%);
+}
+
+.s-btn__icon .svg-icon {
+vertical-align: baseline;
+margin-top: -0.3em;
+margin-bottom: -0.3em;
+transition: opacity 200ms cubic-bezier(.165, .84, .44, 1);
+}
+
+.svg-icon:not(.native) * {
+fill: currentColor;
+}
 }

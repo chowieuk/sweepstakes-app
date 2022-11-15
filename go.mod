@@ -4,11 +4,14 @@ go 1.19
 
 require (
 	github.com/go-chi/chi/v5 v5.0.7
+	github.com/go-chi/cors v1.2.1
 	github.com/go-pkgz/auth v1.20.0
 	github.com/go-pkgz/lgr v0.10.4
 	github.com/joho/godotenv v1.4.0
 	go.mongodb.org/mongo-driver v1.10.3
 )
+
+require github.com/robfig/cron/v3 v3.0.0
 
 require (
 	cloud.google.com/go/compute v1.10.0 // indirect

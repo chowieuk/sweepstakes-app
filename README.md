@@ -121,7 +121,11 @@ type User struct {
 }
 ```
 
-I have yet to add a data model for Nations.
+I have yet to add a data model for Teams.
+
+##
+
+Thank you so much to the creators of github.com/go-pkgz and github.com/go-chi
 
 ## TODO
 

@@ -1,7 +1,11 @@
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import "./Registration.scss";
+import { Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import "./Registration.css";
 
 function Registration() {
+  const [redirect, setRedirect] = useState(false);
 
   const {
     register,
@@ -31,9 +35,7 @@ function Registration() {
         }),
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers":
-            "Origin, X-Requested-With, Content-Type, Accept",
+          Accept: "application/json",
         },
       });
     } catch (err) {}
@@ -41,8 +43,12 @@ function Registration() {
 
   // Sends data after form is complete
   const onSubmit = (data) => {
-    registerUser(data);
+    registerUser(data).then(() => {
+      setRedirect(true);
+    });
   };
+
+  if (redirect) return <Navigate to="/success" />;
 
   return (
     <>

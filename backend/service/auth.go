@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/chowieuk/sweepstakes-app/backend/entity"
+	"github.com/chowieuk/sweepstakes-app/backend/repo"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,7 +22,13 @@ import (
 	//"github.com/go-pkgz/auth/provider/sender" Sender was giving me go mod issues
 )
 
-func InitializeAuth(collection *mongo.Collection) *auth.Service {
+// Client Database instance
+//var Client *mongo.Client = repo.DBinstance()
+
+//var userCollection *mongo.Collection = repo.OpenCollection(Client, "users")
+//var teamCollection *mongo.Collection = repo.OpenCollection(Client, "teams")
+
+func InitializeAuth(userCollection *mongo.Collection, teamCollection *mongo.Collection) *auth.Service {
 
 	// define auth options
 	options := auth.Opts{
@@ -39,6 +46,67 @@ func InitializeAuth(collection *mongo.Collection) *auth.Service {
 			if claims.User != nil && claims.User.Name == "dev_admin" { // set attributes for dev_admin
 				claims.User.SetAdmin(true)
 				claims.User.SetStrAttr("custom-key", "some value")
+			} else if claims.User != nil {
+
+				if strings.HasPrefix(claims.User.ID, "mongo_") {
+					err := repo.SwapEmailNameClaims(userCollection, &claims)
+
+					if err != nil {
+						if err == mongo.ErrNoDocuments {
+							log.Printf("[INFO] no user with that ID found.")
+						}
+						if err != nil {
+							log.Printf("[DEBUG] error swapping claims names %v", err)
+						}
+					}
+				}
+
+				// Check if the user is in the db
+				inDb, err := repo.UserInCollection(userCollection, *claims.User)
+				if err != nil {
+					log.Printf("[DEBUG] error checking if user exists in db: %v", err)
+				}
+				if !inDb {
+					log.Printf("[INFO] user doesn't exist exist in db. Adding user.")
+					// Non social login users must be in the db
+					err = repo.AddSocialUser(userCollection, *claims.User)
+					if err != nil {
+						log.Printf("[DEBUG] failed adding social user to db: %v", err)
+					}
+
+				}
+
+				// Check if the user has been assigned a team
+				// As of writing only social login users can login without being assigned a team
+				team, err := repo.GetUserTeam(teamCollection, *claims.User)
+				if err != nil {
+					if err == mongo.ErrNoDocuments {
+						log.Printf("[INFO] no team assigned to user. Attempting to allocate team")
+						ok, err := repo.CheckTeamAvailability(teamCollection)
+						if err != nil {
+							log.Printf("[DEBUG] error checking availability")
+						}
+						if ok {
+							team, err = repo.AllocateTeamSocial(teamCollection, *claims.User)
+							if err != nil {
+								log.Printf("[DEBUG] error allocating social team: ", err)
+							}
+							err = repo.UpdateSocialUserWithTeam(userCollection, *claims.User, team)
+							if err != nil {
+								log.Printf("[DEBUG] error updating social user with team", err)
+							}
+						}
+					}
+				}
+				if team.Name != "" {
+					claims.User.SetStrAttr("team_name", team.Name)
+					claims.User.SetStrAttr("team_flag", team.Flag)
+				}
+				if team.Name == "" {
+					log.Printf("[INFO] Adding user to waiting list")
+					claims.User.SetStrAttr("team_name", "Waiting List")
+					claims.User.SetStrAttr("team_flag", "https://commons.wikimedia.org/wiki/Category:Red_X_icons#/media/File:Arbcom_ru_declined.svg")
+				}
 			}
 			return claims
 		}),
@@ -77,7 +145,7 @@ func InitializeAuth(collection *mongo.Collection) *auth.Service {
 	service.AddDirectProvider("anonymous", anonymousAuthProvider())
 
 	// allow checking credentials via mongodb store
-	service.AddDirectProvider("mongo", mongoAuthProvider(collection))
+	service.AddDirectProvider("mongo", mongoAuthProvider(userCollection))
 
 	// namecheap email sender setup
 	// namecheapSender := sender.NewEmailClient(sender.EmailParams{
@@ -134,7 +202,7 @@ func checkMongo(collection *mongo.Collection, user, password string) (ok bool, e
 		return false, err
 	}
 
-	passwordIsValid := CheckPasswordHash(password, foundUser.Password)
+	passwordIsValid := CheckPasswordHash(password, *foundUser.Password)
 	defer cancel()
 	if !passwordIsValid {
 		log.Printf("[DEBUG] password does not match hash found in collection %s\n", collection.Name())

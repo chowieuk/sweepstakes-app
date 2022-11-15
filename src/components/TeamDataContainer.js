@@ -41,5 +41,7 @@ const {flag, name_en, name_fa, team_id, ...currentStats} = props.stats;
             value={currentStats.pts}
           />
 
-      </div>;
+      </div>
+
+
 }

@@ -6,10 +6,13 @@ import "./App.css";
 
 // Page Components
 import Registration from "./pages/Registration";
+import RegistrationSuccessful from "./pages/Registersuccessful";
+import RegistrationFail from "./pages/RegisterFail";
 import Login from "./pages/Login";
 import Welcome from "./pages/Welcome";
 import Matches from "./pages/Matches";
 import Leaderboard from "./pages/Leaderboard";
+import HomePageLoggedOn from "./pages/HomepageLoggedOn";
 // import { db } from "./firebase-config";
 // import {
 //   collection,
@@ -24,26 +27,26 @@ import Leaderboard from "./pages/Leaderboard";
 const teamPicker = require("./functions/teamPicker");
 
 //dummyData
-const teams = [
-  {
-    name: "Qatar",
-    availible: true,
-  },
-  {
-    name: "Ecuador",
-    availible: true,
-  },
-  {
-    name: "Senegal",
-    availible: false,
-  },
-  {
-    name: "Netherlands",
-    availible: true,
-  },
-];
+// const teams = [
+//   {
+//     name: "Qatar",
+//     availible: true,
+//   },
+//   {
+//     name: "Ecuador",
+//     availible: true,
+//   },
+//   {
+//     name: "Senegal",
+//     availible: false,
+//   },
+//   {
+//     name: "Netherlands",
+//     availible: true,
+//   },
+// ];
 
-console.log(teamPicker(teams));
+// console.log(teamPicker(teams));
 
 function App() {
   return (
@@ -52,8 +55,11 @@ function App() {
         {/* public routes */}
         <Route path="/" element={<Welcome />} />
         <Route path="/register" element={<Registration />} />
-        <Route path="/login" element={<Login />} />
         {/* logged on routes */}
+        <Route path="/success" element={<RegistrationSuccessful />} />
+        <Route path="/fail" element={<RegistrationFail />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<HomePageLoggedOn />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/matches" element={<Matches />} />
       </Routes>
