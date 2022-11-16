@@ -22,7 +22,7 @@ export default function HomePageLoggedOn() {
 
   const getUserData = async () => {
     try {
-      const res = await fetch("http://localhost:8080/private_data", {
+      const res = await fetch("https://chowie.uk/private_data", {
         //change endpoint as needed
         method: "GET",
         credentials: "include",

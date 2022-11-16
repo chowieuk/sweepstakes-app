@@ -28,18 +28,18 @@ import (
 //var userCollection *mongo.Collection = repo.OpenCollection(Client, "users")
 //var teamCollection *mongo.Collection = repo.OpenCollection(Client, "teams")
 
-func InitializeAuth(userCollection *mongo.Collection, teamCollection *mongo.Collection) *auth.Service {
+func InitializeAuth(userCollection *mongo.Collection, teamCollection *mongo.Collection, secret string) *auth.Service {
 
 	// define auth options
 	options := auth.Opts{
 		SecretReader: token.SecretFunc(func(_ string) (string, error) { // secret key for JWT, ignores aud
-			return "secret", nil // TODO: Research and potentially adjust to a ENV variable
+			return secret, nil // TODO: Research and potentially adjust to a ENV variable
 		}),
 		TokenDuration:     time.Minute,                                 // short token, refreshed automatically
 		CookieDuration:    time.Hour * 24,                              // cookie fine to keep for long time
 		DisableXSRF:       true,                                        // don't disable XSRF in real-life applications!
 		Issuer:            "PaChowie Sweepstakes",                      // part of token, just informational
-		URL:               "http://localhost:8080",                     // base url of the protected service
+		URL:               "https://chowie.uk",                     // base url of the protected service
 		AvatarStore:       avatar.NewLocalFS("/tmp/demo-auth-service"), // stores avatars locally
 		AvatarResizeLimit: 200,                                         // resizes avatars to 200x200
 		ClaimsUpd: token.ClaimsUpdFunc(func(claims token.Claims) token.Claims { // modify issued token
