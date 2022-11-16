@@ -2,10 +2,6 @@
   "name": "sweepstakes-webapp",
   "version": "0.1.0",
   "private": true,
-  "options": {
-    "allowedHosts": ["localhost", ".localhost"],
-    "proxy": "http://api.cup2022.ir/api/v1/"
-  },
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
