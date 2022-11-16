@@ -13,7 +13,7 @@ export default function Welcome() {
 
   const getTeamCount = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/v1/availableteams", {
+      const res = await fetch("https://chowie.uk/api/v1/availableteams", {
         //change endpoint as needed
         method: "GET",
         credentials: "include",

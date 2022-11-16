@@ -8,7 +8,7 @@ const getMatchData = async () => {
   // console.log(`hello ${token}`)
 
   try {
-    return fetch("http://localhost:8080/api/v1/match", {
+    return fetch("https://chowie.uk/api/v1/match", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -123,7 +123,7 @@ func main() {
 	router.Use(logger.New(logger.Log(log.Default()), logger.WithBody, logger.Prefix("[INFO]")).Handler) // log all http requests
 	// Basic CORS
 	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://chowie.uk", "http://localhost:3000", "http://localhost:8080"}, // Use this to allow specific origin hosts
+		AllowedOrigins:   []string{"https://chowie.uk"}, // Use this to allow specific origin hosts
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
@@ -331,13 +331,11 @@ func protectedDataHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	res := struct {
 		TS     time.Time  `json:"ts"`
-		Field1 string     `json:"fld1"`
-		Field2 int        `json:"fld2"`
+		Greeting string     `json:"fld1"`
 		User   token.User `json:"userInfo"`
 	}{
 		TS:     time.Now(),
-		Field1: "some private thing",
-		Field2: 42,
+		Greeting: "Hi John",
 		User:   userInfo,
 	}
 

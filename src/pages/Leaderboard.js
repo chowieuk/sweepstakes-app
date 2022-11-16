@@ -15,7 +15,7 @@ import LeaderboardWrapper from "../components/LeaderboardWrapper";
 
 const getStandingData = async () => {
   try {
-    return fetch("http://localhost:8080/api/v1/standings", {
+    return fetch("https://chowie.uk/api/v1/standings", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
