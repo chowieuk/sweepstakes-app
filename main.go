@@ -39,7 +39,7 @@ var teamCollection *mongo.Collection = repo.OpenCollection(Client, "teams")
 var matchesCollection *mongo.Collection = repo.OpenCollection(Client, "matches")
 var standingsCollection *mongo.Collection = repo.OpenCollection(Client, "standings")
 
-var apiToken, apiUser, apiPass string
+var apiToken, apiUser, apiPass, secret string
 
 func main() {
 
@@ -47,6 +47,10 @@ func main() {
 
 	if err != nil {
 		log.Fatalf("Error loading .env file")
+	}
+
+	if secret = os.Getenv("SECRET_KEY"); secret == "" {
+		log.Fatalf("[FATAL] You must set your 'SECRET_KEY' environmental variable.")
 	}
 
 	if apiUser = os.Getenv("FIFA_API_USER"); apiUser == "" {
@@ -111,7 +115,7 @@ func main() {
 	c.AddJob(standingsInterval, standingsCronJob)
 	c.Start()
 
-	authService := service.InitializeAuth(userCollection, teamCollection)
+	authService := service.InitializeAuth(userCollection, teamCollection, secret)
 
 	// retrieve auth middleware
 	m := authService.Middleware()
@@ -123,7 +127,7 @@ func main() {
 	router.Use(logger.New(logger.Log(log.Default()), logger.WithBody, logger.Prefix("[INFO]")).Handler) // log all http requests
 	// Basic CORS
 	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://chowie.uk", "http://localhost:3000", "http://localhost:8080"}, // Use this to allow specific origin hosts
+		AllowedOrigins:   []string{"https://chowie.uk"}, // Use this to allow specific origin hosts
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
