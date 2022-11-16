@@ -25,10 +25,18 @@
 }
 .leaderboardCard .team-container .team-icon {
   display: flex;
-  justify-content: flex-start;
-  padding: 0px 10px;
-  width: 24px;
+  justify-content: center;
+  align-items: center;
+  padding-left: 30px;
   height: 24px;
+  width: 24px;
+}
+.leaderboardCard .team-container .team-icon img {
+  height: 24px;
+  width: 40px;
+}
+.leaderboardCard .team-container .team-text {
+  padding-left: 20px;
 }
 .leaderboardCard .teamdata-container {
   display: flex;

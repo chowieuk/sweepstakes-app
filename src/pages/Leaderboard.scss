@@ -30,16 +30,23 @@
 
     .team-icon {
       display: flex;
-      justify-content: flex-start;
-      padding: 0px 10px;
-      width: 24px;
+      justify-content: center;
+      align-items: center;
+      padding-left: 30px;
       height: 24px;
+      width: 24px;
+
+      img {
+        height: 24px;
+        width: 40px;
+      }
     }
 
 
-    // .team-text {
 
-    // }
+    .team-text {
+        padding-left: 20px;
+    }
   }
 
   .teamdata-container {
