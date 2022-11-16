@@ -11,7 +11,7 @@ import LeaderboardCard from "../components/LeaderboardCard";
 import LeaderboardWrapper from "../components/LeaderboardWrapper";
 
 // Import Dummy Data DELETE LATER
-const dummyStandingData = require("./standingdummydata.json");
+// const dummyStandingData = require("./standingdummydata.json");
 
 const getStandingData = async () => {
   try {
@@ -50,27 +50,15 @@ export default function Leaderboard() {
       .then(() => setLoading(false))
       .catch(console.error);
 
-    setLoading(false);
   }, []);
 
   return (
     // <></>
     <div className="top-wrapper">
       {loading ? (
-        <Spinner animation="border" variant="primary" />
+        <Spinner style={{"align-self": "center"}} animation="border" variant="primary" />
       ) : (
-      <LeaderboardContainer data={dummyStandingData.data} />
-
-        // dummyStandingData.data.map((group) => {
-        //   // UPDATE THIS TO standingData and uncomment the above useEffect
-        //   return (
-        //     <div key={group._id}>
-        //       {group.teams.map((team) => {
-        //         return <LeaderboardCard team={team} key={team.team_id} />;
-        //       })}
-        //     </div>
-        //   );
-        // })
+      <LeaderboardContainer data={standingData} />
       )}
     </div>
   );

@@ -27,13 +27,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-left: 30px;
+  padding-left: 40px;
   height: 24px;
   width: 24px;
 }
 .leaderboardCard .team-container .team-icon img {
-  height: 24px;
-  width: 40px;
+  height: 30px;
+  width: 50px;
 }
 .leaderboardCard .team-container .team-text {
   padding-left: 20px;
