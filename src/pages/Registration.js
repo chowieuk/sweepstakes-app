@@ -51,7 +51,7 @@ function Registration() {
   if (redirect) return <Navigate to="/success" />;
 
   return (
-    <>
+    <div className="center-wrapper">
       <div className="reg-container">
         <div className="title">2022 World Cup Sweepstakes</div>
         <div className="content">
@@ -113,7 +113,7 @@ function Registration() {
           </form>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

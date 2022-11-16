@@ -1,4 +1,14 @@
+.leaderboard-header {
+  background-color: #303134;
+  color: white;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
 .leaderboardCard {
+  color: white;
   background-color: #171819;
   display: flex;
   flex-direction: row;
@@ -15,18 +25,32 @@
 }
 .leaderboardCard .team-container .team-icon {
   display: flex;
-  justify-content: flex-start;
-  padding: 0px 10px;
-  width: 24px;
+  justify-content: center;
+  align-items: center;
+  padding-left: 40px;
   height: 24px;
+  width: 24px;
+}
+.leaderboardCard .team-container .team-icon img {
+  height: 30px;
+  width: 50px;
+}
+.leaderboardCard .team-container .team-text {
+  padding-left: 20px;
 }
 .leaderboardCard .teamdata-container {
   display: flex;
   text-align: center;
   align-self: flex-end;
 }
+@media only screen and (max-width: 775px) {
+  .leaderboardCard .teamdata-container {
+    display: none;
+  }
+}
 .leaderboardCard .teamdata-container .teamdata-box {
   display: block;
+  min-width: 50px;
 }
 .leaderboardCard .teamdata-container .teamdata-box .databox-header {
   padding: 12px;
@@ -34,6 +58,4 @@
 .leaderboardCard .teamdata-container .teamdata-box .databox-value {
   background-color: #444548;
   padding: 12px;
-}
-
-/*# sourceMappingURL=Leaderboard.css.map */
+}/*# sourceMappingURL=Leaderboard.css.map */

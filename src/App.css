@@ -7,7 +7,6 @@ body {
   height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
   padding: 10px;
   background: rgb(58, 3, 27);
   background: radial-gradient(
@@ -16,6 +15,21 @@ body {
     rgba(130, 17, 51, 1) 40%,
     rgba(58, 3, 27, 1) 100%
   );
+}
+
+.center-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  height: 100vh;
+}
+.top-wrapper {
+  display: flex;
+  align-items: top;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
 }
 
 .container .title {
@@ -108,4 +122,3 @@ form .button input:hover {
   /* transform: scale(0.99); */
   background: linear-gradient(-135deg, #71b7e6, #9b59b6);
 }
-

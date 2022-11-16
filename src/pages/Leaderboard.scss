@@ -1,11 +1,19 @@
-.leadercard-container {
 
 
+// Leaderboard Header
+
+.leaderboard-header {
+  background-color: #303134;
+  color: white;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
 }
-
 
 //leadercard
 .leaderboardCard {
+  color: white;
   background-color: #171819;
   display: flex;
   flex-direction: row;
@@ -22,24 +30,36 @@
 
     .team-icon {
       display: flex;
-      justify-content: flex-start;
-      padding: 0px 10px;
-      width: 24px;
+      justify-content: center;
+      align-items: center;
+      padding-left: 40px;
       height: 24px;
+      width: 24px;
+
+      img {
+        height: 30px;
+        width: 50px;
+      }
     }
 
-    // .team-text {
-    
-    // }
+
+
+    .team-text {
+        padding-left: 20px;
+    }
   }
 
   .teamdata-container {
     display: flex;
     text-align: center;
     align-self: flex-end;
+  @media only screen and (max-width: 775px) {
+    display: none;
+  }
 
     .teamdata-box {
       display: block;
+      min-width: 50px;
       .databox-header {
         padding: 12px;
       }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 const { useState, useEffect, useRef, useCallback } = React;
 
 const InfiniteLooper = function InfiniteLooper({
@@ -54,8 +54,7 @@ const InfiniteLooper = function InfiniteLooper({
 
     resetAnimation();
   }, [looperInstances]);
-  
-  
+
   /*
     6 instances, 200 each = 1200
     parent = 1700
@@ -66,35 +65,39 @@ const InfiniteLooper = function InfiniteLooper({
   // Below resets animation on resize
   // Commenting it out as it will restart the animation when we don't want it to
 
-    //   useEffect(() => {
-    //     window.addEventListener("resize", setupInstances);
+  //   useEffect(() => {
+  //     window.addEventListener("resize", setupInstances);
 
-    //     return () => {
-    //       window.removeEventListener("resize", setupInstances);
-    //     };
-    //   }, [looperInstances, setupInstances]);
+  //     return () => {
+  //       window.removeEventListener("resize", setupInstances);
+  //     };
+  //   }, [looperInstances, setupInstances]);
 
   // Adds an event listener to count how many times the animation has looped
   // This will allow us to stop smoothly
 
-    useEffect(() => {
+  useEffect(() => {
     const handleIteration = () => {
-        iterCount++
-        setIterationCount(iterCount)
+      iterCount++;
+      setIterationCount(iterCount);
     };
 
     const element = instanceRef.current;
 
-    element.addEventListener('animationiteration', handleIteration);
+    element.addEventListener("animationiteration", handleIteration);
 
     return () => {
-        element.removeEventListener('animationiteration', handleIteration);
+      element.removeEventListener("animationiteration", handleIteration);
     };
   });
 
   return (
     <div className="looper" ref={outerRef}>
-      <div className="looper__innerList" ref={innerRef} data-animate={animState} >
+      <div
+        className="looper__innerList"
+        ref={innerRef}
+        data-animate={animState}
+      >
         {[...Array(looperInstances)].map((_, ind) => (
           <div
             ref={instanceRef}
@@ -103,20 +106,28 @@ const InfiniteLooper = function InfiniteLooper({
             style={{
               animationDuration: `${speed}s`,
               animationDirection: direction === "right" ? "reverse" : "normal",
-              animationIterationCount: looperAnimation ? "infinite" : `${iterationCount + 1}`,
+              animationIterationCount: looperAnimation
+                ? "infinite"
+                : `${iterationCount + 1}`,
             }}
           >
             {children}
           </div>
         ))}
       </div>
-      <div className="reveal-button" onClick={() => {
-        setlooperAnimation(false);}
-        }>
-        {looperAnimation ? "Click here to reveal your team!" : `Your team is ${userTeam}`}!
+      <div
+        className="reveal-button"
+        onClick={() => {
+          setlooperAnimation(false);
+        }}
+      >
+        {looperAnimation
+          ? "Click here to reveal your team!"
+          : `Your team is ${userTeam}`}
+        !
       </div>
     </div>
   );
-}
+};
 
-export default InfiniteLooper
+export default InfiniteLooper;

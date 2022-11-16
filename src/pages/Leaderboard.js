@@ -3,21 +3,22 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Spinner from "react-bootstrap/Spinner";
 import Container from "react-bootstrap/Container";
 
-import "./Leaderboard.css"
+import "./Leaderboard.css";
 
 //components
+import LeaderboardContainer from "../components/LeaderboardContainer";
 import LeaderboardCard from "../components/LeaderboardCard";
+import LeaderboardWrapper from "../components/LeaderboardWrapper";
 
 // Import Dummy Data DELETE LATER
 // const dummyStandingData = require("./standingdummydata.json");
 
 const getStandingData = async () => {
-
   try {
     return fetch("http://localhost:8080/api/v1/standings", {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
     }).then((res) => res.json());
   } catch (err) {}
@@ -45,32 +46,19 @@ export default function Leaderboard() {
 
   useEffect(() => {
     getStandingData()
-      // .then((res) => console.log(res.data))
       .then((res) => setStandingData(JSON.parse(JSON.stringify(res.data))))
       .then(() => setLoading(false))
       .catch(console.error);
 
   }, []);
 
-
-console.log(standingData)
-
   return (
-  // <></>
-    <div>
+    // <></>
+    <div className="top-wrapper">
       {loading ? (
-        <Spinner animation="border" variant="primary" />
+        <Spinner style={{"align-self": "center"}} animation="border" variant="primary" />
       ) : (
-        standingData.map((group) => {
-          // UPDATE THIS TO standingData and uncomment the above useEffect
-          return (
-            <div key={group._id}>
-              {group.teams.map((team) => {
-                return <LeaderboardCard team={team} key={team.team_id} />;
-              })}
-            </div>
-          );
-        })
+      <LeaderboardContainer data={standingData} />
       )}
     </div>
   );

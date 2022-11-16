@@ -46,7 +46,7 @@ export default function Login() {
   if (redirect) return <Navigate to="/home" />;
 
   return (
-    <div>
+    <div className="center-wrapper">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="login-container">
           <div className="login-user-details">
