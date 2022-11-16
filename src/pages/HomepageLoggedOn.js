@@ -66,6 +66,17 @@ export default function HomePageLoggedOn() {
               </InfiniteLooper>
             </div>
           </div>
+          <Link
+            to="/leaderboard"
+            style={{ textDecoration: "none", color: "none" }}
+          >
+            <div className="reveal-button" action={"/leaderboard"} style={{ maxWidth: "200px", textAlign: "center", alignSelf: "center", margin: "auto", marginTop: "20px", padding: "10px 0px"  }}>
+              View everyone's team
+            </div>
+          </Link>
+        <div >
+
+        </div>
         </div>
       </div>
     </>
