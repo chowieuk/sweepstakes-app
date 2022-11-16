@@ -26,7 +26,7 @@ function Registration() {
   // register function
   const registerUser = async (data) => {
     try {
-      const res = await fetch("http://localhost:8080/register", {
+      const res = await fetch("https://chowie.uk/register", {
         method: "POST",
         body: JSON.stringify({
           full_name: data.name,

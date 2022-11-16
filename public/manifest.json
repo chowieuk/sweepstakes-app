@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "short_name": "Sweepstakes App",
   "name": "World Cup 2022 Sweepstakes",
@@ -7,3 +8,14 @@
   "theme_color": "#000000",
   "background_color": "#ffffff"
 }
+=======
+{
+  "short_name": "Sweepstakes App",
+  "name": "World Cup 2022 Sweepstakes",
+  "icons": ["/icons/favicon.ico", "/icons/logo192.png", "/icons/logo512.png"],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
+>>>>>>> 813f5cb22e7020859cf089124c4e40143058ceb2

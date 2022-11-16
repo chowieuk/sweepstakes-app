@@ -19,7 +19,7 @@ export default function Login() {
   //logon user
   const logonUser = async (data) => {
     try {
-      const res = await fetch("http://localhost:8080/auth/mongo/login", {
+      const res = await fetch("https://chowie.uk/auth/mongo/login", {
         method: "POST",
         body: JSON.stringify({
           user: data.email,
